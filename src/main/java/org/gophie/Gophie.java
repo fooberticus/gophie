@@ -45,9 +45,6 @@ public class Gophie {
         /* set the proper application title on mac */
         System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Gophie");
 
-        //FlatNightOwlContrastIJTheme.setup();
-        FlatArcDarkOrangeIJTheme.setup();
-
         /* Schedule a job for the event-dispatching thread:
             creating and showing this application's GUI. */
         javax.swing.SwingUtilities.invokeLater(Gophie::createAndShowGUI);
