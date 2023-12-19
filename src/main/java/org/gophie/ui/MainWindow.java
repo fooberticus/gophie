@@ -82,7 +82,7 @@ public class MainWindow implements NavigationInputListener, GopherClientEventLis
         frame = new JFrame(APPLICATION_TITLE);
         frame.setMinimumSize(new Dimension(800, 600));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //this.frame.setIconImage(ConfigurationManager.getImage("icon.png"));
+        //frame.setIconImage(ConfigurationManager.getImage("icon.png"));
         GuiUtil.initGui(frame);
 
         /* MENU BAR */

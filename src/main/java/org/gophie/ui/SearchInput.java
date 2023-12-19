@@ -42,47 +42,47 @@ public class SearchInput extends JPanel {
         /* get the config file */
         ConfigFile configFile = ConfigurationManager.getConfigFile();
 
-        this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        this.setBorder(new EmptyBorder(6, 12, 12, 14));
-        this.setBackground(Color.decode(configFile.getSetting
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        setBorder(new EmptyBorder(6, 12, 12, 14));
+        setBackground(Color.decode(configFile.getSetting
                 ("SEARCH_BACKGROUND", "Appearance", SEARCH_BACKGROUND)));
 
-        this.searchIcon = new JLabel("");
-        this.searchIcon.setFont(ConfigurationManager.getIconFont(16f));
-        this.searchIcon.setBorder(new EmptyBorder(0, 0, 0, 8));
-        this.searchIcon.setForeground(Color.decode(configFile.getSetting
+        searchIcon = new JLabel("");
+        searchIcon.setFont(ConfigurationManager.getIconFont(16f));
+        searchIcon.setBorder(new EmptyBorder(0, 0, 0, 8));
+        searchIcon.setForeground(Color.decode(configFile.getSetting
                 ("SEARCH_TITLECOLOR", "Appearance", SEARCH_TITLECOLOR)));
 
-        this.add(this.searchIcon);
+        add(searchIcon);
 
-        this.searchTitle = new JLabel("Search");
-        this.searchTitle.setForeground(Color.decode(configFile.getSetting
+        searchTitle = new JLabel("Search");
+        searchTitle.setForeground(Color.decode(configFile.getSetting
                 ("SEARCH_TITLECOLOR", "Appearance", SEARCH_TITLECOLOR)));
 
-        this.searchTitle.setBorder(new EmptyBorder(2, 0, 0, 12));
-        this.add(this.searchTitle);
+        searchTitle.setBorder(new EmptyBorder(2, 0, 0, 12));
+        add(searchTitle);
 
-        this.searchText = new JTextField();
-        this.searchText.setBorder(new EmptyBorder(2, 0, 0, 0));
-        this.searchText.setBackground(Color.decode(configFile.getSetting
+        searchText = new JTextField();
+        searchText.setBorder(new EmptyBorder(2, 0, 0, 0));
+        searchText.setBackground(Color.decode(configFile.getSetting
                 ("SEARCH_BACKGROUND", "Appearance", SEARCH_BACKGROUND)));
 
-        this.searchText.setForeground(Color.decode(configFile.getSetting
+        searchText.setForeground(Color.decode(configFile.getSetting
                 ("SEARCH_TEXTCOLOR", "Appearance", SEARCH_TEXTCOLOR)));
 
-        this.searchText.setCaretColor(Color.decode(configFile.getSetting
+        searchText.setCaretColor(Color.decode(configFile.getSetting
                 ("SEARCH_TEXTCOLOR", "Appearance", SEARCH_TEXTCOLOR)));
 
-        this.searchText.setFont(ConfigurationManager.getDefaultFont(14f));
-        this.add(this.searchText);
+        searchText.setFont(ConfigurationManager.getDefaultFont(14f));
+        add(searchText);
 
-        this.setVisible(false);
+        setVisible(false);
     }
 
     public void performSearch(String title, SearchInputListener listener) {
-        this.searchTitle.setText(title);
-        this.searchTitle.setFont(ConfigurationManager.getDefaultFont(14f));
-        this.searchText.addKeyListener(new KeyAdapter() {
+        searchTitle.setText(title);
+        searchTitle.setFont(ConfigurationManager.getDefaultFont(14f));
+        searchText.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
                 /* execute search when the ENTER key is pressed */
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -102,7 +102,7 @@ public class SearchInput extends JPanel {
                 }
             }
         });
-        this.setVisible(true);
-        this.searchText.grabFocus();
+        setVisible(true);
+        searchText.grabFocus();
     }
 }

@@ -43,14 +43,14 @@ public class DownloadItemRenderer extends JPanel implements ListCellRenderer<Dow
         ConfigFile configFile = ConfigurationManager.getConfigFile();
 
         /* render the cell for this download item */
-        this.setOpaque(false);
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.setBorder(new EmptyBorder(5, 10, 5, 10));
+        setOpaque(false);
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBorder(new EmptyBorder(5, 10, 5, 10));
 
         /* highlight if this element is selected */
         if (isSelected) {
-            this.setOpaque(true);
-            this.setBackground(Color.decode(configFile.getSetting
+            setOpaque(true);
+            setBackground(Color.decode(configFile.getSetting
                     ("DOWNLOAD_SELECTED_COLOR", "Appearance", "#cf9a0c")));
         }
 
@@ -58,10 +58,10 @@ public class DownloadItemRenderer extends JPanel implements ListCellRenderer<Dow
         GopherItem item = value.getGopherItem();
 
         /* show the file name in the title */
-        this.titleLabel.setText(item.getFileName());
+        titleLabel.setText(item.getFileName());
         Font titleFont = ConfigurationManager.getConsoleFont(15f);
-        this.titleLabel.setFont(titleFont.deriveFont(titleFont.getStyle() | Font.BOLD));
-        this.titleLabel.setForeground(Color.decode(configFile.getSetting
+        titleLabel.setFont(titleFont.deriveFont(titleFont.getStyle() | Font.BOLD));
+        titleLabel.setForeground(Color.decode(configFile.getSetting
                 ("DOWNLOAD_TITLE_COLOR", "Appearance", "#ffffff")));
 
         /* create the information text based on the status */
@@ -88,15 +88,15 @@ public class DownloadItemRenderer extends JPanel implements ListCellRenderer<Dow
         statusText += " — " + item.getHostName();
 
         /* set the text to the status text label */
-        this.textLabel.setText(statusText);
-        this.textLabel.setBorder(new EmptyBorder(4, 0, 0, 0));
-        this.textLabel.setForeground(Color.decode(configFile.getSetting
+        textLabel.setText(statusText);
+        textLabel.setBorder(new EmptyBorder(4, 0, 0, 0));
+        textLabel.setForeground(Color.decode(configFile.getSetting
                 ("DOWNLOAD_TEXT_COLOR", "Appearance", "#e0e0e0")));
         Font textFont = ConfigurationManager.getConsoleFont(13f);
-        this.textLabel.setFont(textFont);
+        textLabel.setFont(textFont);
 
-        this.add(this.titleLabel);
-        this.add(this.textLabel);
+        add(titleLabel);
+        add(textLabel);
 
         return this;
     }

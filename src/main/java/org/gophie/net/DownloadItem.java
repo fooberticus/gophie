@@ -18,6 +18,7 @@
 
 package org.gophie.net;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.gophie.net.GopherItem.GopherItemType;
 import org.gophie.net.event.DownloadItemEventListener;
@@ -35,7 +36,21 @@ public class DownloadItem implements GopherClientEventListener {
     private final GopherClient client;
     private String fileName;
     private Boolean openFile = false;
+    /**
+     * -- GETTER --
+     *  Returns the number of bytes loaded
+     *
+     * @return The number of bytes loaded as long
+     */
+    @Getter
     private long byteCountLoaded = 0;
+    /**
+     * -- GETTER --
+     *  Returns the status of this download
+     *
+     * @return The status as DownloadStatus enum
+     */
+    @Getter
     private DownloadStatus status = DownloadStatus.IDLE;
     private final ArrayList<DownloadItemEventListener> eventListenerList = new ArrayList<DownloadItemEventListener>();
     /*
@@ -43,6 +58,7 @@ public class DownloadItem implements GopherClientEventListener {
      * operates
      */
     private long startTimeMillis = 0;
+    @Getter
     private long bytePerSecond = 0;
     /**
      * Constructor creates the download and starts it immediately
@@ -52,27 +68,26 @@ public class DownloadItem implements GopherClientEventListener {
      * @param openWhenFinished If true, opens the file when finished
      */
     public DownloadItem(GopherItem gopherItem, String targetFile, Boolean openWhenFinished) {
-        this.client = new GopherClient();
-        this.item = gopherItem;
-        this.fileName = targetFile;
-        this.openFile = openWhenFinished;
-        this.start();
+        client = new GopherClient();
+        item = gopherItem;
+        fileName = targetFile;
+        openFile = openWhenFinished;
+        start();
     }
 
     /**
      * Constructor creates the item with default values and does not do anything
      */
     public DownloadItem() {
-        this.client = new GopherClient();
-        this.status = DownloadStatus.IDLE;
+        client = new GopherClient();
     }
 
     public void addEventListener(DownloadItemEventListener listener) {
-        this.eventListenerList.add(listener);
+        eventListenerList.add(listener);
     }
 
     private void notifyProgress() {
-        for (DownloadItemEventListener listener : this.eventListenerList) {
+        for (DownloadItemEventListener listener : eventListenerList) {
             listener.downloadProgressReported();
         }
     }
@@ -82,9 +97,9 @@ public class DownloadItem implements GopherClientEventListener {
      */
     public void start() {
         /* start the download process */
-        String url = new GopherUrl(this.item.getUrlString()).getUrlString();
-        this.client.downloadAsync(url, this.fileName, this);
-        this.status = DownloadStatus.ACTIVE;
+        String url = new GopherUrl(item.getUrlString()).getUrlString();
+        client.downloadAsync(url, fileName, this);
+        status = DownloadStatus.ACTIVE;
     }
 
     /**
@@ -92,11 +107,11 @@ public class DownloadItem implements GopherClientEventListener {
      */
     public void deleteFile() {
         try {
-            File file = new File(this.fileName);
+            File file = new File(fileName);
             file.delete();
         } catch (Exception ex) {
             /* just log the error and keep the crap, what else to do? */
-            log.error("Failed to delete downloaded file ({}): {}", this.fileName, ex.getMessage());
+            log.error("Failed to delete downloaded file ({}): {}", fileName, ex.getMessage());
         }
     }
 
@@ -104,7 +119,7 @@ public class DownloadItem implements GopherClientEventListener {
      * Cancels this download
      */
     public void cancel() {
-        this.client.cancelFetch();
+        client.cancelFetch();
     }
 
     /**
@@ -113,7 +128,7 @@ public class DownloadItem implements GopherClientEventListener {
      * @param targetFile Path of the file to store data in
      */
     public void setTargetFile(String targetFile) {
-        this.fileName = targetFile;
+        fileName = targetFile;
     }
 
     /**
@@ -122,7 +137,7 @@ public class DownloadItem implements GopherClientEventListener {
      * @return Returns the gopher item to download
      */
     public GopherItem getGopherItem() {
-        return this.item;
+        return item;
     }
 
     /**
@@ -131,29 +146,7 @@ public class DownloadItem implements GopherClientEventListener {
      * @param gopherItem The gopher item to download
      */
     public void setGopherItem(GopherItem gopherItem) {
-        this.item = gopherItem;
-    }
-
-    /**
-     * Returns the status of this download
-     *
-     * @return The status as DownloadStatus enum
-     */
-    public DownloadStatus getStatus() {
-        return this.status;
-    }
-
-    /**
-     * Returns the number of bytes loaded
-     *
-     * @return The number of bytes loaded as long
-     */
-    public long getByteCountLoaded() {
-        return this.byteCountLoaded;
-    }
-
-    public long getBytePerSecond() {
-        return this.bytePerSecond;
+        item = gopherItem;
     }
 
     /**
@@ -163,55 +156,55 @@ public class DownloadItem implements GopherClientEventListener {
         try {
             /* use the desktop to open the file */
             if (Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().open(new File(this.fileName));
+                Desktop.getDesktop().open(new File(fileName));
             } else {
                 /* no desktop support here, report one level up */
                 throw new Exception("Desktop not supported");
             }
         } catch (Exception ex) {
             /* output the exception that the file could not be opened */
-            log.error("Unable to open file after download ({}): {}", this.fileName, ex.getMessage());
+            log.error("Unable to open file after download ({}): {}", fileName, ex.getMessage());
         }
     }
 
     @Override
     public void progress(GopherUrl url, long byteCount) {
         /* set start time to calculate total duration */
-        if (this.startTimeMillis == 0) {
+        if (startTimeMillis == 0) {
             /* use time in milliseconds */
-            this.startTimeMillis = System.currentTimeMillis();
+            startTimeMillis = System.currentTimeMillis();
         }
 
         /* calculate the bitrate of the download */
         long timeNow = System.currentTimeMillis();
-        long duration = ((timeNow - this.startTimeMillis) / 1000);
+        long duration = ((timeNow - startTimeMillis) / 1000);
         if (duration > 0 && byteCount > 0) {
-            this.bytePerSecond = (byteCount / duration);
+            bytePerSecond = (byteCount / duration);
         }
 
         /* update the local byte counter */
-        this.byteCountLoaded = byteCount;
+        byteCountLoaded = byteCount;
 
-        this.notifyProgress();
+        notifyProgress();
     }
 
     @Override
     public void pageLoaded(GopherPage result) {
         /* set the status to complete */
-        this.status = DownloadStatus.COMPLETED;
+        status = DownloadStatus.COMPLETED;
 
         /* check if file open was requested */
-        if (this.openFile) {
-            this.openFileOnDesktop();
+        if (openFile) {
+            openFileOnDesktop();
         }
 
-        this.notifyProgress();
+        notifyProgress();
     }
 
     @Override
     public void pageLoadFailed(GopherError error, GopherUrl url) {
-        this.status = DownloadStatus.FAILED;
-        this.notifyProgress();
+        status = DownloadStatus.FAILED;
+        notifyProgress();
     }
 
     @Override

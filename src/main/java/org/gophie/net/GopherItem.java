@@ -43,7 +43,7 @@ public class GopherItem {
     */
     public GopherItem(String line) {
         /* type code is defined as first character in line */
-        this.setItemTypeByCode(line.substring(0, 1));
+        setItemTypeByCode(line.substring(0, 1));
 
         /* get all properties for this item */
         String[] property = line.replace("\r", "").replace("\n", "").split("\t");
@@ -51,25 +51,25 @@ public class GopherItem {
         /* display string is first property without type code char */
         if (property.length > 0) {
             if (property[0].length() > 1) {
-                this.userDisplayString = property[0].substring(1);
+                userDisplayString = property[0].substring(1);
             }
         }
 
         /* second property is the selector */
         if (property.length > 1) {
-            this.selector = property[1].trim();
+            selector = property[1].trim();
         }
 
         /* third property is the host name of the target */
         if (property.length > 2) {
-            this.hostName = property[2].trim();
+            hostName = property[2].trim();
         }
 
         /* fourth property is the port of the target host */
         if (property.length > 3) {
             try {
                 /* try to parse the port number */
-                this.portNumber = Integer.parseInt(property[3].trim());
+                portNumber = Integer.parseInt(property[3].trim());
             } catch (Exception ex) {
                 /* report the failure */
                 log.error("Found what was supposed to be a port number and it did not parse into an integer: {}", ex.getMessage());
@@ -84,11 +84,11 @@ public class GopherItem {
      * @param url  The url of the gopher item
      */
     public GopherItem(GopherItemType type, GopherUrl url) {
-        this.itemType = type;
-        this.hostName = url.getHost();
-        this.portNumber = url.getPort();
-        this.selector = url.getSelector();
-        this.userDisplayString = this.getFileName();
+        itemType = type;
+        hostName = url.getHost();
+        portNumber = url.getPort();
+        selector = url.getSelector();
+        userDisplayString = getFileName();
     }
 
     /**
@@ -98,11 +98,11 @@ public class GopherItem {
      * @param url          the url of the gopher item
      */
     public GopherItem(String itemTypeCode, GopherUrl url) {
-        this.setItemTypeByCode(itemTypeCode);
-        this.hostName = url.getHost();
-        this.portNumber = url.getPort();
-        this.selector = url.getSelector();
-        this.userDisplayString = this.getFileName();
+        setItemTypeByCode(itemTypeCode);
+        hostName = url.getHost();
+        portNumber = url.getPort();
+        selector = url.getSelector();
+        userDisplayString = getFileName();
     }
 
     /**
@@ -245,14 +245,14 @@ public class GopherItem {
         Returns the item type as GopherItemType enum
     */
     public GopherItemType getItemType() {
-        return this.itemType;
+        return itemType;
     }
 
     /*
         Returns the item type code as a string
     */
     public String getItemTypeCode() {
-        return this.itemTypeCode;
+        return itemTypeCode;
     }
 
     /*
@@ -261,21 +261,21 @@ public class GopherItem {
         gopher item when being displayed
     */
     public String getUserDisplayString() {
-        return this.userDisplayString;
+        return userDisplayString;
     }
 
     /*
         Returns the selector of this gopher item
     */
     public String getSelector() {
-        return this.selector;
+        return selector;
     }
 
     /*
         Returns the item host name as a string
     */
     public String getHostName() {
-        return this.hostName;
+        return hostName;
     }
 
     /*
@@ -283,7 +283,7 @@ public class GopherItem {
         item's host to collect the content from
     */
     public int getPortNumber() {
-        return this.portNumber;
+        return portNumber;
     }
 
     /**
@@ -296,31 +296,31 @@ public class GopherItem {
 
         /* unknown or information links do not have
             any link associated with it */
-        if (this.itemType != GopherItemType.UNKNOWN
-                && this.itemType != GopherItemType.INFORMATION) {
+        if (itemType != GopherItemType.UNKNOWN
+                && itemType != GopherItemType.INFORMATION) {
             /* check if the selector contains a URL */
-            if (this.selector.startsWith("URL:")
-                    || this.selector.startsWith("/URL:")) {
+            if (selector.startsWith("URL:")
+                    || selector.startsWith("/URL:")) {
                 /* selector is link to other resource */
-                if (this.selector.startsWith("/URL:")) {
-                    result = this.selector.substring(5);
+                if (selector.startsWith("/URL:")) {
+                    result = selector.substring(5);
                 } else {
-                    result = this.selector.substring(4);
+                    result = selector.substring(4);
                 }
             } else {
                 /* protocol is definitely gopher */
-                result = "gopher://" + this.hostName;
-                if (this.portNumber != 70) {
-                    result += ":" + this.portNumber;
+                result = "gopher://" + hostName;
+                if (portNumber != 70) {
+                    result += ":" + portNumber;
                 }
 
                 /* add the slash to the URL if not present */
-                if (!this.selector.startsWith("/")) {
+                if (!selector.startsWith("/")) {
                     result += "/";
                 }
 
                 /* finally append the selector */
-                result += this.selector;
+                result += selector;
             }
         }
 
@@ -333,7 +333,7 @@ public class GopherItem {
      * @return Filename as string as defined in the url
      */
     public String getFileName() {
-        String result = this.getUrlString();
+        String result = getUrlString();
 
         if (result.lastIndexOf("/") > 0) {
             result = result.substring(result.lastIndexOf("/") + 1);
@@ -351,11 +351,11 @@ public class GopherItem {
      * @return Filename as string with forced extension
      */
     public String getFileNameWithForcedExt() {
-        String result = this.getFileName();
+        String result = getFileName();
 
         /* check if the file has an extension */
         if (result.lastIndexOf(".") == -1) {
-            result += "." + GopherItem.getDefaultFileExt(this.getItemType());
+            result += "." + GopherItem.getDefaultFileExt(getItemType());
         }
 
         return result;
@@ -369,7 +369,7 @@ public class GopherItem {
     public String getFileExt() {
         String result = "txt";
 
-        String fileName = this.getFileName();
+        String fileName = getFileName();
         if (fileName.lastIndexOf(".") > 0) {
             result = fileName.substring(fileName.lastIndexOf(".") + 1);
         }
@@ -387,11 +387,11 @@ public class GopherItem {
     public Boolean isBinaryFile() {
         Boolean result = false;
 
-        if (this.itemType == GopherItemType.BINHEX_FILE
-                || this.itemType == GopherItemType.DOS_FILE
-                || this.itemType == GopherItemType.UUENCODED_FILE
-                || this.itemType == GopherItemType.BINARY_FILE
-                || this.itemType == GopherItemType.SOUND_FILE) {
+        if (itemType == GopherItemType.BINHEX_FILE
+                || itemType == GopherItemType.DOS_FILE
+                || itemType == GopherItemType.UUENCODED_FILE
+                || itemType == GopherItemType.BINARY_FILE
+                || itemType == GopherItemType.SOUND_FILE) {
             /* this item is a binary file */
             result = true;
         }
@@ -407,55 +407,55 @@ public class GopherItem {
     public String getTypeName() {
         String result = "Unknown";
 
-        if (this.getItemType() == GopherItemType.TEXTFILE) {
+        if (getItemType() == GopherItemType.TEXTFILE) {
             result = "Text file";
         }
-        if (this.getItemType() == GopherItemType.GOPHERMENU) {
+        if (getItemType() == GopherItemType.GOPHERMENU) {
             result = "Gopher menu";
         }
-        if (this.getItemType() == GopherItemType.CCSCO_NAMESERVER) {
+        if (getItemType() == GopherItemType.CCSCO_NAMESERVER) {
             result = "CCSO Nameserver";
         }
-        if (this.getItemType() == GopherItemType.ERRORCODE) {
+        if (getItemType() == GopherItemType.ERRORCODE) {
             result = "Error code";
         }
-        if (this.getItemType() == GopherItemType.BINHEX_FILE) {
+        if (getItemType() == GopherItemType.BINHEX_FILE) {
             result = "BinHex file (Macintosh)";
         }
-        if (this.getItemType() == GopherItemType.DOS_FILE) {
+        if (getItemType() == GopherItemType.DOS_FILE) {
             result = "DOS file";
         }
-        if (this.getItemType() == GopherItemType.UUENCODED_FILE) {
+        if (getItemType() == GopherItemType.UUENCODED_FILE) {
             result = "uuencoded file";
         }
-        if (this.getItemType() == GopherItemType.FULLTEXT_SEARCH) {
+        if (getItemType() == GopherItemType.FULLTEXT_SEARCH) {
             result = "Full-text search";
         }
-        if (this.getItemType() == GopherItemType.TELNET) {
+        if (getItemType() == GopherItemType.TELNET) {
             result = "Telnet";
         }
-        if (this.getItemType() == GopherItemType.BINARY_FILE) {
+        if (getItemType() == GopherItemType.BINARY_FILE) {
             result = "Binary file";
         }
-        if (this.getItemType() == GopherItemType.MIRROR) {
+        if (getItemType() == GopherItemType.MIRROR) {
             result = "Mirror";
         }
-        if (this.getItemType() == GopherItemType.GIF_FILE) {
+        if (getItemType() == GopherItemType.GIF_FILE) {
             result = "GIF file";
         }
-        if (this.getItemType() == GopherItemType.IMAGE_FILE) {
+        if (getItemType() == GopherItemType.IMAGE_FILE) {
             result = "Image file";
         }
-        if (this.getItemType() == GopherItemType.TELNET3270) {
+        if (getItemType() == GopherItemType.TELNET3270) {
             result = "Telnet 3270";
         }
-        if (this.getItemType() == GopherItemType.HTML_FILE) {
+        if (getItemType() == GopherItemType.HTML_FILE) {
             result = "HTML file";
         }
-        if (this.getItemType() == GopherItemType.INFORMATION) {
+        if (getItemType() == GopherItemType.INFORMATION) {
             result = "Information";
         }
-        if (this.getItemType() == GopherItemType.SOUND_FILE) {
+        if (getItemType() == GopherItemType.SOUND_FILE) {
             result = "Sound file";
         }
 
@@ -536,8 +536,8 @@ public class GopherItem {
      * @param code the single-char gopher item type code
      */
     private void setItemTypeByCode(String code) {
-        this.itemTypeCode = code;
-        this.itemType = this.getItemTypeByCode(code);
+        itemTypeCode = code;
+        itemType = getItemTypeByCode(code);
     }
 
     /* defines the official types of gopher items */

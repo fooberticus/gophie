@@ -18,6 +18,8 @@
 
 package org.gophie.net;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.gophie.config.ConfigurationManager;
 import org.gophie.net.GopherItem.GopherItemType;
@@ -35,10 +37,38 @@ public class GopherPage {
     /* defines the default charset */
     private static final String GOPHERPAGE_DEFAULT_CHARSET = "UTF-8";
 
+    /**
+     * -- SETTER --
+     *  Sets the source code (gophermap) of this gopher page
+     *
+     * @param value The text value as supplied by the server
+     */
     /* local variables */
+    @Setter
     private byte[] sourceCode;
+    /**
+     * -- GETTER --
+     *  Returns the GopherUrl object for this page
+     *
+     * @return GopherUrl object with url of this page
+     */
+    @Getter
     private final GopherUrl url;
+    /**
+     * -- GETTER --
+     *  Returns an array list with all gopher items of this page
+     *
+     * @return ArrayList with all GopherItem objects
+     */
+    @Getter
     private final ArrayList<GopherItem> itemList;
+    /**
+     * -- GETTER --
+     *  Returns the content type of this page
+     *
+     * @return The content type as gopher item type
+     */
+    @Getter
     private GopherItemType contentType = GopherItemType.UNKNOWN;
 
     /**
@@ -53,39 +83,30 @@ public class GopherPage {
      * @param gopherPageUrl        The URL of the gopher page
      */
     public GopherPage(byte[] gopherPageSourceCode, GopherItemType gopherContentType, GopherUrl gopherPageUrl) {
-        this.sourceCode = gopherPageSourceCode;
-        this.url = gopherPageUrl;
-        this.itemList = new ArrayList<GopherItem>();
+        sourceCode = gopherPageSourceCode;
+        url = gopherPageUrl;
+        itemList = new ArrayList<>();
 
         if (gopherContentType == GopherItemType.GOPHERMENU
                 || gopherContentType == GopherItemType.UNKNOWN) {
             /* try to parse it as a gopher menu */
             try {
                 /* execute the parse process */
-                this.parse();
+                parse();
 
                 /* parsing succeeded, define as gopher menu */
-                this.contentType = GopherItemType.GOPHERMENU;
+                contentType = GopherItemType.GOPHERMENU;
             } catch (Exception ex) {
                 /* output the parser exception */
                 log.error("Failed to parse gophermenu: {}", ex.getMessage(), ex);
 
                 /* parsing failed for whatever, define as text */
-                this.contentType = GopherItemType.TEXTFILE;
+                contentType = GopherItemType.TEXTFILE;
             }
         } else {
             /* set the supplied content type */
-            this.contentType = gopherContentType;
+            contentType = gopherContentType;
         }
-    }
-
-    /**
-     * Returns the content type of this page
-     *
-     * @return The content type as gopher item type
-     */
-    public GopherItemType getContentType() {
-        return this.contentType;
     }
 
     /**
@@ -95,7 +116,7 @@ public class GopherPage {
      * @return String with base64 encoded data of the source code
      */
     public String getBase64() {
-        return Base64.getEncoder().encodeToString(this.sourceCode);
+        return Base64.getEncoder().encodeToString(sourceCode);
     }
 
     /**
@@ -104,7 +125,7 @@ public class GopherPage {
      * @return Byte array with the raw gopher page data
      */
     public byte[] getByteArray() {
-        return this.sourceCode;
+        return sourceCode;
     }
 
     /**
@@ -114,40 +135,13 @@ public class GopherPage {
      */
     public String getSourceCode() {
         try {
-            return new String(this.sourceCode, ConfigurationManager.getConfigFile()
+            return new String(sourceCode, ConfigurationManager.getConfigFile()
                     .getSetting("DEFAULT_CHARSET", "Network", GOPHERPAGE_DEFAULT_CHARSET));
         } catch (Exception ex) {
             /* drop a quick info on the console when decoding fails */
             log.error("Failed to decode bytes of Gopher Page: {}", ex.getMessage());
             return "";
         }
-    }
-
-    /**
-     * Sets the source code (gophermap) of this gopher page
-     *
-     * @param value The text value as supplied by the server
-     */
-    public void setSourceCode(byte[] value) {
-        this.sourceCode = value;
-    }
-
-    /**
-     * Returns the GopherUrl object for this page
-     *
-     * @return GopherUrl object with url of this page
-     */
-    public GopherUrl getUrl() {
-        return this.url;
-    }
-
-    /**
-     * Returns an array list with all gopher items of this page
-     *
-     * @return ArrayList with all GopherItem objects
-     */
-    public ArrayList<GopherItem> getItemList() {
-        return this.itemList;
     }
 
     /**
@@ -158,15 +152,15 @@ public class GopherPage {
     public String getTextContent() {
         String result = "";
 
-        if (this.itemList.size() > 0) {
+        if (itemList.size() > 0) {
             /* get the actual text from all gopher items */
-            for (GopherItem item : this.itemList) {
+            for (GopherItem item : itemList) {
                 result += item.getUserDisplayString() + "\n";
             }
         } else {
             /* just return the source code and remove the
                 line termination from the gopher server */
-            return this.getSourceCode().replace("\r\n.\r\n", "");
+            return getSourceCode().replace("\r\n.\r\n", "");
         }
 
         return result;
@@ -180,18 +174,17 @@ public class GopherPage {
      * @return truen when successful, otherwise false
      */
     public Boolean saveAsFile(String fileName) {
-        Boolean result = false;
+        boolean result = false;
 
         try {
             /* store this page content to file */
             FileOutputStream fileOutput = new FileOutputStream(fileName);
-            fileOutput.write(this.getByteArray());
+            fileOutput.write(getByteArray());
             fileOutput.close();
             result = true;
         } catch (Exception ex) {
             /* output the exception info when file storage failed */
             log.error("Failed to save page as file: {}", ex.getMessage());
-            result = false;
         }
 
         return result;
@@ -203,7 +196,7 @@ public class GopherPage {
      * @return The file name as string with extension
      */
     public String getFileName() {
-        String result = this.getUrl().getUrlString();
+        String result = getUrl().getUrlString();
 
         /* check if the file has a file name */
         if (result.lastIndexOf("/") > 0) {
@@ -216,7 +209,7 @@ public class GopherPage {
 
         /* check if the file has an extension */
         if (result.lastIndexOf(".") == -1) {
-            result += "." + GopherItem.getDefaultFileExt(this.getContentType());
+            result += "." + GopherItem.getDefaultFileExt(getContentType());
         }
 
         return result;
@@ -226,12 +219,10 @@ public class GopherPage {
      * parses the local source code into components
      */
     private void parse() {
-        String[] itemSourceList = this.getSourceCode().split("\n");
-        for (int i = 0; i < itemSourceList.length; i++) {
-            String itemSource = itemSourceList[i];
-
-            if (itemSource.length() > 0 && !itemSource.equals(".")) {
-                this.itemList.add(new GopherItem(itemSource));
+        String[] itemSourceList = getSourceCode().split("\n");
+        for (String itemSource : itemSourceList) {
+            if (!itemSource.isEmpty() && !itemSource.equals(".")) {
+                itemList.add(new GopherItem(itemSource));
             }
         }
     }

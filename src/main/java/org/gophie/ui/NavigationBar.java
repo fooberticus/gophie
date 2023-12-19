@@ -66,28 +66,28 @@ public class NavigationBar extends JPanel {
         @textHoverColor     Color of the text and icons on hover
     */
     public NavigationBar(String backgroundColor, String textColor, String textHoverColor) {
-        this.inputListenerList = new ArrayList<>();
+        inputListenerList = new ArrayList<>();
 
         /* get the config file for color scheme */
         ConfigFile configFile = ConfigurationManager.getConfigFile();
 
         /* get the icon font from the configuration */
-        this.iconFont = ConfigurationManager.getIconFont(20f);
+        iconFont = ConfigurationManager.getIconFont(20f);
 
         /* store the text color locally */
         NavigationBar.textHoverColorHex = textHoverColor;
         NavigationBar.textColorHex = textColor;
 
         /* set the background color initially */
-        //this.setBackgroundColor(backgroundColor);
+        //setBackgroundColor(backgroundColor);
 
         /* set the layout for this navigation bar */
-        this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        this.setBorder(new EmptyBorder(4, 4, 4, 4));
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        setBorder(new EmptyBorder(4, 4, 4, 4));
 
         /* create the back navigation button */
-        this.backButton = this.createButton("");
-        this.backButton.addMouseListener(new MouseAdapter() {
+        backButton = createButton("");
+        backButton.addMouseListener(new MouseAdapter() {
             /* notify the listeners of the move back request */
             public void mouseReleased(MouseEvent evt) {
                 if (allowNavigateBack) {
@@ -113,8 +113,8 @@ public class NavigationBar extends JPanel {
         });
 
         /* create the forward navigation button */
-        this.forwardButton = this.createButton("");
-        this.forwardButton.addMouseListener(new MouseAdapter() {
+        forwardButton = createButton("");
+        forwardButton.addMouseListener(new MouseAdapter() {
             /* notify the listeners of the forward move request */
             public void mouseReleased(MouseEvent evt) {
                 if (allowNavigateForward) {
@@ -140,8 +140,8 @@ public class NavigationBar extends JPanel {
         });
 
         /* create the refresh button and handle it */
-        this.refreshButton = this.createButton("");
-        this.refreshButton.addMouseListener(new MouseAdapter() {
+        refreshButton = createButton("");
+        refreshButton.addMouseListener(new MouseAdapter() {
             /* initiate a refresh or cancel process */
             public void mouseReleased(MouseEvent evt) {
                 /* request a refresh when currently in network idle */
@@ -171,8 +171,8 @@ public class NavigationBar extends JPanel {
         });
 
         /* create the refresh button and handle it */
-        this.homeButton = this.createButton("");
-        this.homeButton.addMouseListener(new MouseAdapter() {
+        homeButton = createButton("");
+        homeButton.addMouseListener(new MouseAdapter() {
             /* request navigation to the home page */
             public void mouseReleased(MouseEvent evt) {
                 /* request to g to home gopher page */
@@ -195,13 +195,13 @@ public class NavigationBar extends JPanel {
         });
 
         /* create the address input */
-        this.addressInput = this.createAddressInput();
-        //this.addressInput.setSelectionColor(Color.decode(configFile.getSetting("NAVIGATIONBAR_SELECTION_COLOR", "Appearance", this.selectionColor)));
-        //this.addressInput.setCaretColor(Color.decode(NavigationBar.textColorHex));
+        addressInput = createAddressInput();
+        //addressInput.setSelectionColor(Color.decode(configFile.getSetting("NAVIGATIONBAR_SELECTION_COLOR", "Appearance", selectionColor)));
+        //addressInput.setCaretColor(Color.decode(NavigationBar.textColorHex));
 
         /* create the download button and handle it */
-        this.downloadButton = this.createButton("");
-        this.downloadButton.addMouseListener(new MouseAdapter() {
+        downloadButton = createButton("");
+        downloadButton.addMouseListener(new MouseAdapter() {
             /* notify the listeners of the forward move request */
             public void mouseReleased(MouseEvent evt) {
                 for (NavigationInputListener inputListener : inputListenerList) {
@@ -224,11 +224,11 @@ public class NavigationBar extends JPanel {
 
         /* create the status indicator */
         ImageIcon statusIconImage = ConfigurationManager.getImageIcon("loading.gif");
-        this.statusIcon = new JLabel(statusIconImage);
-        this.statusIcon.setBorder(new EmptyBorder(0, 8, 0, 2));
-        this.statusIcon.setOpaque(false);
-        this.statusIcon.setVisible(false);
-        this.add(this.statusIcon);
+        statusIcon = new JLabel(statusIconImage);
+        statusIcon.setBorder(new EmptyBorder(0, 8, 0, 2));
+        statusIcon.setOpaque(false);
+        statusIcon.setVisible(false);
+        add(statusIcon);
     }
 
     /**
@@ -237,7 +237,7 @@ public class NavigationBar extends JPanel {
      * @param value true enables navigation, false disables
      */
     public void setNavigateForward(Boolean value) {
-        this.allowNavigateForward = value;
+        allowNavigateForward = value;
     }
 
     /**
@@ -246,7 +246,7 @@ public class NavigationBar extends JPanel {
      * @param value true enables navigation, false disables
      */
     public void setNavigateBack(Boolean value) {
-        this.allowNavigateBack = value;
+        allowNavigateBack = value;
     }
 
     /**
@@ -255,14 +255,14 @@ public class NavigationBar extends JPanel {
      * @param status true when currently loading content, false if not
      */
     public void setIsLoading(Boolean status) {
-        this.isLoadingStatus = status;
+        isLoadingStatus = status;
 
         if (status) {
-            this.statusIcon.setVisible(true);
-            this.refreshButton.setText("");
+            statusIcon.setVisible(true);
+            refreshButton.setText("");
         } else {
-            this.statusIcon.setVisible(false);
-            this.refreshButton.setText("");
+            statusIcon.setVisible(false);
+            refreshButton.setText("");
         }
     }
 
@@ -270,7 +270,7 @@ public class NavigationBar extends JPanel {
         Adds a listener for navigation events
     */
     public void addListener(NavigationInputListener listener) {
-        this.inputListenerList.add(listener);
+        inputListenerList.add(listener);
     }
 
     /*
@@ -279,7 +279,7 @@ public class NavigationBar extends JPanel {
         @addressText    text to insert into address input
     */
     public void setAddressText(String addressText) {
-        this.addressInput.setText(addressText);
+        addressInput.setText(addressText);
     }
 
     /*
@@ -293,7 +293,7 @@ public class NavigationBar extends JPanel {
         inputField.setFont(ConfigurationManager.getDefaultFont(14f));
         //inputField.setForeground(Color.decode(NavigationBar.textColorHex));
         inputField.setOpaque(false);
-        this.add(inputField);
+        add(inputField);
 
         inputField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -337,14 +337,14 @@ public class NavigationBar extends JPanel {
         JLabel button = new JLabel(text);
 
         /* set the icon font */
-        button.setFont(this.iconFont);
+        button.setFont(iconFont);
         //button.setForeground(Color.decode(NavigationBar.textColorHex));
 
         /* set the border properly to give some space */
         button.setBorder(new EmptyBorder(0, 8, 0, 8));
 
         /* add the button the bar */
-        this.add(button);
+        add(button);
 
         return button;
     }
@@ -355,6 +355,6 @@ public class NavigationBar extends JPanel {
         @colorHex       the hex code for the background color
     */
     public void setBackgroundColor(String colorHex) {
-        //this.setBackground(Color.decode(colorHex));
+        //setBackground(Color.decode(colorHex));
     }
 }

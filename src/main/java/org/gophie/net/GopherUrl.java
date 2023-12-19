@@ -29,30 +29,30 @@ public class GopherUrl {
      * @param url the url to parse as string
      */
     public GopherUrl(String url) {
-        this.host = url;
+        host = url;
 
         /* check if the url contains the protocol specifier */
-        if (this.host.startsWith("gopher://")) {
-            this.host = this.host.substring(9);
+        if (host.startsWith("gopher://")) {
+            host = host.substring(9);
         }
 
         /* check if a selector was provided */
-        if (this.host.indexOf("/") > 0) {
-            this.selector = this.host.substring(this.host.indexOf("/"));
-            this.host = this.host.substring(0, this.host.indexOf("/"));
+        if (host.indexOf("/") > 0) {
+            selector = host.substring(host.indexOf("/"));
+            host = host.substring(0, host.indexOf("/"));
         } else {
             /* no selector present, set the default to empty string */
-            this.selector = "";
+            selector = "";
         }
 
         /* check if a port number was provided */
-        if (this.host.indexOf(":") > 0) {
+        if (host.indexOf(":") > 0) {
             /* remove port number from host name */
-            String[] valueList = this.host.split(":");
-            this.host = valueList[0];
+            String[] valueList = host.split(":");
+            host = valueList[0];
 
             /* set the port number separately */
-            this.port = Integer.parseInt(valueList[1]);
+            port = Integer.parseInt(valueList[1]);
         }
     }
 
@@ -62,7 +62,7 @@ public class GopherUrl {
      * @return the port number as integer
      */
     public int getPort() {
-        return this.port;
+        return port;
     }
 
     /**
@@ -71,7 +71,7 @@ public class GopherUrl {
      * @return host name as string
      */
     public String getHost() {
-        return this.host;
+        return host;
     }
 
     /**
@@ -80,7 +80,7 @@ public class GopherUrl {
      * @return the selector as string
      */
     public String getSelector() {
-        return this.selector;
+        return selector;
     }
 
     /**
@@ -91,10 +91,10 @@ public class GopherUrl {
     public String getTypePrefix() {
         String result = null;
 
-        if (this.selector.length() >= 3) {
-            if (this.selector.charAt(0) == '/' && this.selector.charAt(2) == '/') {
-                String itemTypeCode = this.selector.substring(1, 2);
-                if (itemTypeCode.matches("[0-9\\+gIThis\\?]")) {
+        if (selector.length() >= 3) {
+            if (selector.charAt(0) == '/' && selector.charAt(2) == '/') {
+                String itemTypeCode = selector.substring(1, 2);
+                if (itemTypeCode.matches("[0-9+gIThis?]")) {
                     result = itemTypeCode;
                 }
             }
@@ -110,29 +110,29 @@ public class GopherUrl {
      */
     public void setTypePrefix(String prefix) {
         /* check if a type prefix is present already */
-        if (this.hasTypePrefix()) {
+        if (hasTypePrefix()) {
             /* replace the existing type prefix with the new one */
-            if (this.selector.length() > 3) {
-                if (this.selector.charAt(3) == '/') {
-                    this.selector = "/" + prefix + this.selector.substring(3);
+            if (selector.length() > 3) {
+                if (selector.charAt(3) == '/') {
+                    selector = "/" + prefix + selector.substring(3);
                 } else {
-                    this.selector = "/" + prefix + "/" + this.selector.substring(3);
+                    selector = "/" + prefix + "/" + selector.substring(3);
                 }
             } else {
                 /* only the prefix is in the selector, replace it */
-                this.selector = "/" + prefix + "/";
+                selector = "/" + prefix + "/";
             }
         } else {
-            if (this.selector.length() > 0) {
+            if (!selector.isEmpty()) {
                 /* just add the type prefix to the selector */
-                if (this.selector.charAt(0) == '/') {
-                    this.selector = "/" + prefix + this.selector;
+                if (selector.charAt(0) == '/') {
+                    selector = "/" + prefix + selector;
                 } else {
-                    this.selector = "/" + prefix + "/" + this.selector;
+                    selector = "/" + prefix + "/" + selector;
                 }
             } else {
                 /* just set the prefix as the selector */
-                this.selector = "/" + prefix + "/";
+                selector = "/" + prefix + "/";
             }
         }
     }
@@ -144,7 +144,7 @@ public class GopherUrl {
      * @return
      */
     public boolean hasTypePrefix() {
-        boolean result = this.getTypePrefix() != null;
+        boolean result = getTypePrefix() != null;
 
         return result;
     }
@@ -156,7 +156,7 @@ public class GopherUrl {
      * @return the url string of the url
      */
     public String getUrlString() {
-        return this.getUrlString(false);
+        return getUrlString(false);
     }
 
     /**
@@ -168,24 +168,24 @@ public class GopherUrl {
      * @return the url as string
      */
     public String getUrlString(boolean includeTypePrefix) {
-        String result = this.host;
+        String result = host;
 
-        if (this.port != 70) {
-            result += ":" + this.port;
+        if (port != 70) {
+            result += ":" + port;
         }
 
         /* strip the item type prefix as it is just
             for presentation and technically not part
             of the url itself */
-        String selectorValue = this.selector;
-        if (this.hasTypePrefix()) {
+        String selectorValue = selector;
+        if (hasTypePrefix()) {
             if (!includeTypePrefix) {
                 /* remove the type prefix if requested */
                 selectorValue = selectorValue.substring(3);
             }
         }
 
-        if (selectorValue.length() > 0) {
+        if (!selectorValue.isEmpty()) {
             if (selectorValue.startsWith("/")) {
                 result += selectorValue;
             } else {
