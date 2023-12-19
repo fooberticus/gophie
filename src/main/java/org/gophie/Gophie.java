@@ -18,7 +18,6 @@
 
 package org.gophie;
 
-import com.formdev.flatlaf.intellijthemes.FlatArcDarkOrangeIJTheme;
 import org.gophie.ui.MainWindow;
 
 import javax.swing.*;
@@ -39,14 +38,8 @@ public class Gophie {
         UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
         UIManager.getDefaults().put("ScrollPane.border", BorderFactory.createEmptyBorder());
 
-        /* set to use the mac menu bar instead */
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
-
-        /* set the proper application title on mac */
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Gophie");
-
         /* Schedule a job for the event-dispatching thread:
             creating and showing this application's GUI. */
-        javax.swing.SwingUtilities.invokeLater(Gophie::createAndShowGUI);
+        SwingUtilities.invokeLater(Gophie::createAndShowGUI);
     }
 }

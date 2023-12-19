@@ -25,6 +25,7 @@ import org.gophie.net.GopherItem;
 import org.gophie.net.GopherItem.GopherItemType;
 import org.gophie.net.GopherPage;
 import org.gophie.ui.event.NavigationInputListener;
+import org.gophie.ui.util.GuiUtil;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -55,7 +56,7 @@ public class PageView extends JScrollPane {
     private final JEditorPane headerPane;
     private final HTMLEditorKit editorKit;
     private StyleSheet styleSheet;
-    private final Font textFont;
+    private Font textFont;
     private String viewTextColor = "#ffffff";
     private final String selectionColor = "#cf9a0c";
 
@@ -79,7 +80,7 @@ public class PageView extends JScrollPane {
         this.configFile = ConfigurationManager.getConfigFile();
 
         /* instanciate input listener list */
-        this.inputListenerList = new ArrayList<NavigationInputListener>();
+        this.inputListenerList = new ArrayList<>();
 
         /* create the editor kit instance */
         this.editorKit = new HTMLEditorKit();
@@ -109,9 +110,6 @@ public class PageView extends JScrollPane {
         this.viewPane.setDragEnabled(false);
         this.getViewport().add(this.viewPane);
 
-        /* set the text color locally */
-        this.viewTextColor = textColor;
-
         /* adjust the scrollbars */
         this.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         this.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -134,21 +132,20 @@ public class PageView extends JScrollPane {
         this.pageMenu.addPageMenuEventListener(parent);
         this.viewPane.add(this.pageMenu);
         this.viewPane.addMouseListener(new MouseAdapter() {
-            /* handle the popup trigger for this document */
             public void mouseReleased(MouseEvent evt) {
-                /* get the trigger button for the menu from config
-                    (right mouse button id is usually #3) */
-                int menuTriggerButtonId = Integer.parseInt(configFile.getSetting
-                        ("MENU_MOUSE_TRIGGERBUTTON", "Navigation", "3"));
-                if (evt.getButton() == menuTriggerButtonId) {
-                    /* trigger hit, show the page menu and also
-                        make sure to pass the text selection before */
-                    pageMenu.setSelectedText(viewPane.getSelectedText());
-
-                    /* show the menu */
-                    pageMenu.show(viewPane,
-                            (int) evt.getPoint().getX(),
-                            (int) evt.getPoint().getY());
+                switch (evt.getButton()) {
+                    case 3: // right mouse context menu
+                        pageMenu.setSelectedText(viewPane.getSelectedText());
+                        pageMenu.show(viewPane, (int) evt.getPoint().getX(), (int) evt.getPoint().getY());
+                        break;
+                    case 4: // "back" button on 5+ button mouse
+                        inputListenerList.forEach(NavigationInputListener::backwardRequested);
+                        break;
+                    case 5: // "forward" button on 5+ button mouse
+                        inputListenerList.forEach(NavigationInputListener::forwardRequested);
+                        break;
+                    default:
+                        break;
                 }
             }
         });
@@ -192,7 +189,8 @@ public class PageView extends JScrollPane {
         });
 
         /* try to open the font for icon display */
-        this.textFont = ConfigurationManager.getConsoleFont(ConfigurationManager.getConsoleFontSize(18f));
+        this.textFont = ConfigurationManager
+                .getConsoleFont(ConfigurationManager.getConsoleFontSize(GuiUtil.getGlobalFontSize()));
 
         /* apply the font settings to the view pane */
         this.viewPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
@@ -357,8 +355,8 @@ public class PageView extends JScrollPane {
      */
     private void configureStyle() {
         /* get the color schemes from the config file */
-        String linkColor = this.configFile.getSetting("PAGE_LINK_COLOR", "Appearance", "#22c75c");
-        String lineNumberColor = this.configFile.getSetting("PAGE_LINENUMBER_COLOR", "Appearance", "#454545");
+        //String linkColor = this.configFile.getSetting("PAGE_LINK_COLOR", "Appearance", "#22c75c");
+        //String lineNumberColor = this.configFile.getSetting("PAGE_LINENUMBER_COLOR", "Appearance", "#454545");
 
         /* get the configured icon font size */
         String iconFontSize = ConfigurationManager.getConfigFile().getSetting("PAGE_ICON_FONT_SIZE", "Appearance", "10");
@@ -367,10 +365,9 @@ public class PageView extends JScrollPane {
         this.styleSheet = this.editorKit.getStyleSheet();
         this.styleSheet.addRule("body { white-space:nowrap; margin:0; padding:0; vertical-align: top;}");
         this.styleSheet.addRule(".text { cursor:text; }");
-        this.styleSheet.addRule(".lineNumber { color: " + lineNumberColor + "; }");
+        //this.styleSheet.addRule(".lineNumber { color: " + lineNumberColor + "; }");
         this.styleSheet.addRule(".itemIcon { font-family:Feather; font-size:" + iconFontSize + "px; margin-left:5px; }");
-        this.styleSheet.addRule("a { text-decoration: none; color: " + linkColor + "; }");
-        this.styleSheet.addRule(".item { color: " + this.viewTextColor + "; }");
+        //this.styleSheet.addRule("a { text-decoration: none; color: " + linkColor + "; }");
     }
 
     /**

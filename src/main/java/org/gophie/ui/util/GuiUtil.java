@@ -23,7 +23,7 @@ import java.util.prefs.Preferences;
 public final class GuiUtil {
 
     public static final String APPLICATION_NAME = "Gophie";
-    public static final String DEFAULT_THEME = "Arc Dark Orange";
+    public static final String DEFAULT_THEME = "Material Darker Contrast";
     private static final String NAMESPACE = "org.gophie.Gophie";
     private static final int DEFAULT_FONT_SIZE = 18;
 
@@ -139,6 +139,7 @@ public final class GuiUtil {
         return font.deriveFont((float) prefs.getInt(PROPERTY_FONT_SIZE, DEFAULT_FONT_SIZE));
     }
 
+
     private static void setGlobalFontSizeOffset(int offSet) {
         Font newFont = getDefaultFontWithSizeOffset(offSet);
         UIManager.put("defaultFont", newFont);
@@ -182,6 +183,10 @@ public final class GuiUtil {
     }
 
     /* MAIN WINDOW SIZE UTILITIES */
+
+    public static float getGlobalFontSize() {
+        return prefs.getFloat(PROPERTY_FONT_SIZE, 18f);
+    }
 
     public static int getSavedWindowWidth() {
         return prefs.getInt(PROPERTY_WINDOW_WIDTH, 800);
