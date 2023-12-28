@@ -106,10 +106,7 @@ public class MainWindow implements NavigationInputListener, GopherClientEventLis
 
 
         /* create the page view component object */
-        // TODO refactor to let theme handle color
-        pageView = new PageView(this,
-                configFile.getSetting("VIEW_TEXTCOLOR", "Appearance", VIEW_TEXTCOLOR),
-                configFile.getSetting("VIEW_BACKGROUND", "Appearance", VIEW_BACKGROUND));
+        pageView = new PageView(this);
         pageView.addListener(this);
 
         /* create the navigation bar */

@@ -57,11 +57,6 @@ public class PageView extends JScrollPane {
     private final HTMLEditorKit editorKit;
     private StyleSheet styleSheet;
     private Font textFont;
-    private String viewTextColor = "#ffffff";
-    private final String selectionColor = "#cf9a0c";
-
-    /* the config file with all settings */
-    private final ConfigFile configFile;
 
     /* listeners for local events */
     private final ArrayList<NavigationInputListener> inputListenerList;
@@ -72,13 +67,8 @@ public class PageView extends JScrollPane {
     /**
      * Constructs the PageView component object
      *
-     * @param textColor       The color of the text to display
-     * @param backgroundColor The background color of the viewer
      */
-    public PageView(MainWindow parent, String textColor, String backgroundColor) {
-        /* get the config file to fetch the settings */
-        configFile = ConfigurationManager.getConfigFile();
-
+    public PageView(MainWindow parent) {
         /* instanciate input listener list */
         inputListenerList = new ArrayList<>();
 
@@ -100,12 +90,9 @@ public class PageView extends JScrollPane {
         };
 
         viewPane.setEditable(false);
-        //viewPane.setBackground(Color.decode(backgroundColor));
-        //viewPane.setForeground(Color.decode(textColor));
         viewPane.setBorder(new EmptyBorder(10, 4, 8, 16));
         viewPane.setEditorKit(editorKit);
         viewPane.setCursor(new Cursor(Cursor.TEXT_CURSOR));
-        //viewPane.setSelectionColor(Color.decode(configFile.getSetting("PAGE_SELECTION_COLOR", "Appearance", selectionColor)));
 
         viewPane.setDragEnabled(false);
         getViewport().add(viewPane);
@@ -117,8 +104,6 @@ public class PageView extends JScrollPane {
         /* create the header pane with line numbers and icons */
         headerPane = new JEditorPane();
         headerPane.setEditable(false);
-        //headerPane.setBackground(Color.decode(backgroundColor));
-        //headerPane.setForeground(Color.decode(textColor));
         headerPane.setBorder(new EmptyBorder(10, 12, 8, 2));
         headerPane.setEditorKit(editorKit);
         headerPane.setDragEnabled(false);
@@ -237,11 +222,12 @@ public class PageView extends JScrollPane {
 
                 /* try to determine the filetype from the url */
                 String imageUrl = content.getUrl().getUrlString();
-                if (imageUrl.substring(imageUrl.length() - 4).equals(".")) {
+                String imageUrlChopped = imageUrl.substring(imageUrl.length() - 4);
+                if (imageUrlChopped.equals(".")) {
                     imageFileExt = imageUrl.substring(imageUrl.length() - 3);
                 }
                 if (imageUrl.substring(imageUrl.length() - 5).equals(".")) {
-                    imageFileExt = imageUrl.substring(imageUrl.length() - 4);
+                    imageFileExt = imageUrlChopped;
                 }
 
                 /* write the image content to file */
@@ -307,16 +293,19 @@ public class PageView extends JScrollPane {
         pageMenu.setCurrentPage(page);
 
         /* create the headers */
-        String renderedHeader = "<table cellspacing=\"0\" cellpadding=\"2\">";
-        String renderedContent = "<table cellspacing=\"0\" cellpadding=\"2\">";
+        StringBuilder renderedHeader = new StringBuilder("<table cellspacing=\"0\" cellpadding=\"2\">");
+        StringBuilder renderedContent = new StringBuilder("<table cellspacing=\"0\" cellpadding=\"2\">");
 
         int lineNumber = 1;
         for (GopherItem item : page.getItemList()) {
             /* set the content for the row header */
-            renderedHeader += "<tr><td class=\"lineNumber\">" + lineNumber + "</td>"
-                    + "<td><div class=\"itemIcon\">"
-                    + getGopherItemTypeIcon(item.getItemTypeCode())
-                    + "</div></td></tr>";
+            renderedHeader
+                    .append("<tr><td class=\"lineNumber\">")
+                    .append(lineNumber)
+                    .append("</td>")
+                    .append("<td><div class=\"itemIcon\">")
+                    .append(getGopherItemTypeIcon(item.getItemTypeCode()))
+                    .append("</div></td></tr>");
 
             /* set the content for the text view */
             String itemTitle = formatItemTitle(item.getUserDisplayString());
@@ -333,7 +322,10 @@ public class PageView extends JScrollPane {
             }
 
             /* create the item table row */
-            renderedContent += "<tr><td class=\"item\">" + itemCode + "</td></tr>";
+            renderedContent
+                    .append("<tr><td class=\"item\">")
+                    .append(itemCode)
+                    .append("</td></tr>");
 
             lineNumber++;
         }
@@ -354,10 +346,6 @@ public class PageView extends JScrollPane {
      * Configures the style of the view
      */
     private void configureStyle() {
-        /* get the color schemes from the config file */
-        //String linkColor = configFile.getSetting("PAGE_LINK_COLOR", "Appearance", "#22c75c");
-        //String lineNumberColor = configFile.getSetting("PAGE_LINENUMBER_COLOR", "Appearance", "#454545");
-
         /* get the configured icon font size */
         String iconFontSize = ConfigurationManager.getConfigFile().getSetting("PAGE_ICON_FONT_SIZE", "Appearance", "10");
 
@@ -365,9 +353,8 @@ public class PageView extends JScrollPane {
         styleSheet = editorKit.getStyleSheet();
         styleSheet.addRule("body { white-space:nowrap; margin:0; padding:0; vertical-align: top;}");
         styleSheet.addRule(".text { cursor:text; }");
-        //styleSheet.addRule(".lineNumber { color: " + lineNumberColor + "; }");
         styleSheet.addRule(".itemIcon { font-family:Feather; font-size:" + iconFontSize + "px; margin-left:5px; }");
-        //styleSheet.addRule("a { text-decoration: none; color: " + linkColor + "; }");
+        styleSheet.addRule("a { text-decoration: none; }");
     }
 
     /**
