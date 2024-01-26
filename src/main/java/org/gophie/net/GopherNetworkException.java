@@ -27,15 +27,15 @@ public class GopherNetworkException extends Exception {
     private final String errorMessage;
 
     public GopherNetworkException(GopherError errorTypeCode, String errorTypeMessage) {
-        this.errorCode = errorTypeCode;
-        this.errorMessage = errorTypeMessage;
+        errorCode = errorTypeCode;
+        errorMessage = errorTypeMessage;
     }
 
     public String getGopherErrorMessage() {
-        return this.errorMessage;
+        return errorMessage;
     }
 
     public GopherError getGopherErrorType() {
-        return this.errorCode;
+        return errorCode;
     }
 }

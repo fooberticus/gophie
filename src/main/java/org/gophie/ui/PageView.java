@@ -25,6 +25,7 @@ import org.gophie.net.GopherItem;
 import org.gophie.net.GopherItem.GopherItemType;
 import org.gophie.net.GopherPage;
 import org.gophie.ui.event.NavigationInputListener;
+import org.gophie.ui.util.GuiUtil;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -55,12 +56,7 @@ public class PageView extends JScrollPane {
     private final JEditorPane headerPane;
     private final HTMLEditorKit editorKit;
     private StyleSheet styleSheet;
-    private final Font textFont;
-    private String viewTextColor = "#ffffff";
-    private final String selectionColor = "#cf9a0c";
-
-    /* the config file with all settings */
-    private final ConfigFile configFile;
+    private Font textFont;
 
     /* listeners for local events */
     private final ArrayList<NavigationInputListener> inputListenerList;
@@ -71,21 +67,16 @@ public class PageView extends JScrollPane {
     /**
      * Constructs the PageView component object
      *
-     * @param textColor       The color of the text to display
-     * @param backgroundColor The background color of the viewer
      */
-    public PageView(MainWindow parent, String textColor, String backgroundColor) {
-        /* get the config file to fetch the settings */
-        this.configFile = ConfigurationManager.getConfigFile();
-
+    public PageView(MainWindow parent) {
         /* instanciate input listener list */
-        this.inputListenerList = new ArrayList<NavigationInputListener>();
+        inputListenerList = new ArrayList<>();
 
         /* create the editor kit instance */
-        this.editorKit = new HTMLEditorKit();
+        editorKit = new HTMLEditorKit();
 
         /* create the editor pane */
-        this.viewPane = new JEditorPane() {
+        viewPane = new JEditorPane() {
             private static final long serialVersionUID = 1L;
 
             /**
@@ -98,63 +89,54 @@ public class PageView extends JScrollPane {
             }
         };
 
-        this.viewPane.setEditable(false);
-        //this.viewPane.setBackground(Color.decode(backgroundColor));
-        //this.viewPane.setForeground(Color.decode(textColor));
-        this.viewPane.setBorder(new EmptyBorder(10, 4, 8, 16));
-        this.viewPane.setEditorKit(this.editorKit);
-        this.viewPane.setCursor(new Cursor(Cursor.TEXT_CURSOR));
-        //this.viewPane.setSelectionColor(Color.decode(this.configFile.getSetting("PAGE_SELECTION_COLOR", "Appearance", this.selectionColor)));
+        viewPane.setEditable(false);
+        viewPane.setBorder(new EmptyBorder(10, 4, 8, 16));
+        viewPane.setEditorKit(editorKit);
+        viewPane.setCursor(new Cursor(Cursor.TEXT_CURSOR));
 
-        this.viewPane.setDragEnabled(false);
-        this.getViewport().add(this.viewPane);
-
-        /* set the text color locally */
-        this.viewTextColor = textColor;
+        viewPane.setDragEnabled(false);
+        getViewport().add(viewPane);
 
         /* adjust the scrollbars */
-        this.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        this.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         /* create the header pane with line numbers and icons */
-        this.headerPane = new JEditorPane();
-        this.headerPane.setEditable(false);
-        //this.headerPane.setBackground(Color.decode(backgroundColor));
-        //this.headerPane.setForeground(Color.decode(textColor));
-        this.headerPane.setBorder(new EmptyBorder(10, 12, 8, 2));
-        this.headerPane.setEditorKit(this.editorKit);
-        this.headerPane.setDragEnabled(false);
-        this.setRowHeaderView(this.headerPane);
+        headerPane = new JEditorPane();
+        headerPane.setEditable(false);
+        headerPane.setBorder(new EmptyBorder(10, 12, 8, 2));
+        headerPane.setEditorKit(editorKit);
+        headerPane.setDragEnabled(false);
+        setRowHeaderView(headerPane);
 
         /* configure the style of the header and the view */
-        this.configureStyle();
+        configureStyle();
 
         /* create the page menu and attach the popup trigger */
-        this.pageMenu = new PageMenu();
-        this.pageMenu.addPageMenuEventListener(parent);
-        this.viewPane.add(this.pageMenu);
-        this.viewPane.addMouseListener(new MouseAdapter() {
-            /* handle the popup trigger for this document */
+        pageMenu = new PageMenu();
+        pageMenu.addPageMenuEventListener(parent);
+        viewPane.add(pageMenu);
+        viewPane.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent evt) {
-                /* get the trigger button for the menu from config
-                    (right mouse button id is usually #3) */
-                int menuTriggerButtonId = Integer.parseInt(configFile.getSetting
-                        ("MENU_MOUSE_TRIGGERBUTTON", "Navigation", "3"));
-                if (evt.getButton() == menuTriggerButtonId) {
-                    /* trigger hit, show the page menu and also
-                        make sure to pass the text selection before */
-                    pageMenu.setSelectedText(viewPane.getSelectedText());
-
-                    /* show the menu */
-                    pageMenu.show(viewPane,
-                            (int) evt.getPoint().getX(),
-                            (int) evt.getPoint().getY());
+                switch (evt.getButton()) {
+                    case 3: // right mouse context menu
+                        pageMenu.setSelectedText(viewPane.getSelectedText());
+                        pageMenu.show(viewPane, (int) evt.getPoint().getX(), (int) evt.getPoint().getY());
+                        break;
+                    case 4: // "back" button on 5+ button mouse
+                        inputListenerList.forEach(NavigationInputListener::backwardRequested);
+                        break;
+                    case 5: // "forward" button on 5+ button mouse
+                        inputListenerList.forEach(NavigationInputListener::forwardRequested);
+                        break;
+                    default:
+                        break;
                 }
             }
         });
 
         /* report any links hits as address request to the listeners */
-        this.viewPane.addHyperlinkListener(new HyperlinkListener() {
+        viewPane.addHyperlinkListener(new HyperlinkListener() {
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 /* get the url of that link */
                 String urlValue = e.getDescription();
@@ -192,16 +174,17 @@ public class PageView extends JScrollPane {
         });
 
         /* try to open the font for icon display */
-        this.textFont = ConfigurationManager.getConsoleFont(ConfigurationManager.getConsoleFontSize(18f));
+        textFont = ConfigurationManager
+                .getConsoleFont(ConfigurationManager.getConsoleFontSize(GuiUtil.getGlobalFontSize()));
 
         /* apply the font settings to the view pane */
-        this.viewPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-        this.viewPane.setFont(this.textFont);
+        viewPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        viewPane.setFont(textFont);
 
         /* apply the font settings to the header pane */
-        this.headerPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-        this.headerPane.setFont(this.textFont);
-        this.headerPane.setHighlighter(null);
+        headerPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        headerPane.setFont(textFont);
+        headerPane.setHighlighter(null);
     }
 
     /**
@@ -210,7 +193,7 @@ public class PageView extends JScrollPane {
      * @param listener The listener that responds to navigation events
      */
     public void addListener(NavigationInputListener listener) {
-        this.inputListenerList.add(listener);
+        inputListenerList.add(listener);
     }
 
     /**
@@ -221,10 +204,10 @@ public class PageView extends JScrollPane {
      */
     public void showGopherContent(GopherPage content) {
         /* reset the header to just show nothing */
-        this.headerPane.setText("");
+        headerPane.setText("");
 
         /* set current page to the page menu */
-        this.pageMenu.setCurrentPage(content);
+        pageMenu.setCurrentPage(content);
 
         /* check the type of content supplied */
         if (content.getContentType() == GopherItemType.IMAGE_FILE
@@ -239,11 +222,12 @@ public class PageView extends JScrollPane {
 
                 /* try to determine the filetype from the url */
                 String imageUrl = content.getUrl().getUrlString();
-                if (imageUrl.substring(imageUrl.length() - 4).equals(".")) {
+                String imageUrlChopped = imageUrl.substring(imageUrl.length() - 4);
+                if (imageUrlChopped.equals(".")) {
                     imageFileExt = imageUrl.substring(imageUrl.length() - 3);
                 }
                 if (imageUrl.substring(imageUrl.length() - 5).equals(".")) {
-                    imageFileExt = imageUrl.substring(imageUrl.length() - 4);
+                    imageFileExt = imageUrlChopped;
                 }
 
                 /* write the image content to file */
@@ -271,17 +255,17 @@ public class PageView extends JScrollPane {
                 }
 
                 /* display content as an image */
-                this.viewPane.setContentType("text/html");
-                this.viewPane.setText(imageHtmlCode);
+                viewPane.setContentType("text/html");
+                viewPane.setText(imageHtmlCode);
             } catch (Exception ex) {
                 /* display exception cause as text inside the view */
-                this.viewPane.setContentType("text/plain");
-                this.viewPane.setText("Failed to display the image:\n" + ex.getMessage());
+                viewPane.setContentType("text/plain");
+                viewPane.setText("Failed to display the image:\n" + ex.getMessage());
             }
         } else {
             /* display content as plain text */
-            this.viewPane.setContentType("text/plain");
-            this.viewPane.setText(content.getSourceCode().replace("\n.\r\n", ""));
+            viewPane.setContentType("text/plain");
+            viewPane.setText(content.getSourceCode().replace("\n.\r\n", ""));
         }
     }
 
@@ -303,25 +287,28 @@ public class PageView extends JScrollPane {
      */
     public void showGopherPage(GopherPage page) {
         /* set the current local gopher page */
-        this.currentPage = page;
+        currentPage = page;
 
         /* set current page to the page menu */
-        this.pageMenu.setCurrentPage(page);
+        pageMenu.setCurrentPage(page);
 
         /* create the headers */
-        String renderedHeader = "<table cellspacing=\"0\" cellpadding=\"2\">";
-        String renderedContent = "<table cellspacing=\"0\" cellpadding=\"2\">";
+        StringBuilder renderedHeader = new StringBuilder("<table cellspacing=\"0\" cellpadding=\"2\">");
+        StringBuilder renderedContent = new StringBuilder("<table cellspacing=\"0\" cellpadding=\"2\">");
 
         int lineNumber = 1;
         for (GopherItem item : page.getItemList()) {
             /* set the content for the row header */
-            renderedHeader += "<tr><td class=\"lineNumber\">" + lineNumber + "</td>"
-                    + "<td><div class=\"itemIcon\">"
-                    + this.getGopherItemTypeIcon(item.getItemTypeCode())
-                    + "</div></td></tr>";
+            renderedHeader
+                    .append("<tr><td class=\"lineNumber\">")
+                    .append(lineNumber)
+                    .append("</td>")
+                    .append("<td><div class=\"itemIcon\">")
+                    .append(getGopherItemTypeIcon(item.getItemTypeCode()))
+                    .append("</div></td></tr>");
 
             /* set the content for the text view */
-            String itemTitle = this.formatItemTitle(item.getUserDisplayString());
+            String itemTitle = formatItemTitle(item.getUserDisplayString());
 
             if (itemTitle.isEmpty()) {
                 itemTitle = "&nbsp;";
@@ -335,42 +322,39 @@ public class PageView extends JScrollPane {
             }
 
             /* create the item table row */
-            renderedContent += "<tr><td class=\"item\">" + itemCode + "</td></tr>";
+            renderedContent
+                    .append("<tr><td class=\"item\">")
+                    .append(itemCode)
+                    .append("</td></tr>");
 
             lineNumber++;
         }
 
         /* set content type and add content to view */
-        this.viewPane.setContentType("text/html");
-        this.viewPane.setText(renderedContent + "</table>");
+        viewPane.setContentType("text/html");
+        viewPane.setText(renderedContent + "</table>");
 
         /* set content type and add content to header */
-        this.headerPane.setContentType("text/html");
-        this.headerPane.setText(renderedHeader + "</table>");
+        headerPane.setContentType("text/html");
+        headerPane.setText(renderedHeader + "</table>");
 
         /* scroll the view pane to the top */
-        this.viewPane.setCaretPosition(0);
+        viewPane.setCaretPosition(0);
     }
 
     /**
      * Configures the style of the view
      */
     private void configureStyle() {
-        /* get the color schemes from the config file */
-        String linkColor = this.configFile.getSetting("PAGE_LINK_COLOR", "Appearance", "#22c75c");
-        String lineNumberColor = this.configFile.getSetting("PAGE_LINENUMBER_COLOR", "Appearance", "#454545");
-
         /* get the configured icon font size */
         String iconFontSize = ConfigurationManager.getConfigFile().getSetting("PAGE_ICON_FONT_SIZE", "Appearance", "10");
 
         /* build up the stylesheet for the rendering */
-        this.styleSheet = this.editorKit.getStyleSheet();
-        this.styleSheet.addRule("body { white-space:nowrap; margin:0; padding:0; vertical-align: top;}");
-        this.styleSheet.addRule(".text { cursor:text; }");
-        this.styleSheet.addRule(".lineNumber { color: " + lineNumberColor + "; }");
-        this.styleSheet.addRule(".itemIcon { font-family:Feather; font-size:" + iconFontSize + "px; margin-left:5px; }");
-        this.styleSheet.addRule("a { text-decoration: none; color: " + linkColor + "; }");
-        this.styleSheet.addRule(".item { color: " + this.viewTextColor + "; }");
+        styleSheet = editorKit.getStyleSheet();
+        styleSheet.addRule("body { white-space:nowrap; margin:0; padding:0; vertical-align: top;}");
+        styleSheet.addRule(".text { cursor:text; }");
+        styleSheet.addRule(".itemIcon { font-family:Feather; font-size:" + iconFontSize + "px; margin-left:5px; }");
+        styleSheet.addRule("a { text-decoration: none; }");
     }
 
     /**
@@ -378,8 +362,8 @@ public class PageView extends JScrollPane {
      */
     public void selectAllText() {
         /* just pass it onto the view */
-        this.viewPane.selectAll();
-        this.viewPane.requestFocus();
+        viewPane.selectAll();
+        viewPane.requestFocus();
     }
 
     /**
