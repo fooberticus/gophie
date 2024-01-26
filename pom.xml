@@ -6,7 +6,7 @@
 
     <groupId>org.gophie</groupId>
     <artifactId>gophie</artifactId>
-    <version>0.3.3</version>
+    <version>0.4.0</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
