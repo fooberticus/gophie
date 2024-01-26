@@ -36,11 +36,11 @@ public class DownloadList extends ArrayList<DownloadItem> implements DownloadIte
      * @return All download items as an array
      */
     public DownloadItem[] getDownloadItemArray() {
-        DownloadItem[] result = new DownloadItem[this.size()];
+        DownloadItem[] result = new DownloadItem[size()];
 
         /* create the list upside down with the latest first */
-        for (int i = this.size() - 1; i >= 0; i--) {
-            result[(this.size() - 1) - i] = this.get(i);
+        for (int i = size() - 1; i >= 0; i--) {
+            result[(size() - 1) - i] = get(i);
         }
 
         return result;
@@ -61,23 +61,23 @@ public class DownloadList extends ArrayList<DownloadItem> implements DownloadIte
 
     public void clearNonActiveItems() {
         ArrayList<DownloadItem> currentList = this;
-        this.clear();
+        clear();
 
         for (DownloadItem item : currentList) {
             if (item.getStatus() == DownloadStatus.ACTIVE) {
-                this.add(item);
+                add(item);
             }
         }
 
-        this.notifyUpdate();
+        notifyUpdate();
     }
 
     public void addEventListener(DownloadListEventListener listener) {
-        this.eventListener.add(listener);
+        eventListener.add(listener);
     }
 
     private void notifyUpdate() {
-        for (DownloadListEventListener listener : this.eventListener) {
+        for (DownloadListEventListener listener : eventListener) {
             listener.downloadListUpdated();
         }
     }
@@ -86,19 +86,19 @@ public class DownloadList extends ArrayList<DownloadItem> implements DownloadIte
     public boolean add(DownloadItem e) {
         boolean result = super.add(e);
         e.addEventListener(this);
-        this.notifyUpdate();
+        notifyUpdate();
         return result;
     }
 
     @Override
     public void clear() {
         super.clear();
-        this.notifyUpdate();
+        notifyUpdate();
     }
 
     @Override
     public void downloadProgressReported() {
-        for (DownloadListEventListener listener : this.eventListener) {
+        for (DownloadListEventListener listener : eventListener) {
             listener.downloadProgressReported();
         }
     }

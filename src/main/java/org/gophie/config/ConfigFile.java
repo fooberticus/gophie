@@ -47,9 +47,9 @@ public class ConfigFile {
      * @param configFileName the full file name of the config file
      */
     public ConfigFile(String configFileName) {
-        this.config = new HashMap<String, HashMap<String, String>>();
-        this.fileName = configFileName;
-        this.parse();
+        config = new HashMap<>();
+        fileName = configFileName;
+        parse();
     }
 
     /**
@@ -64,9 +64,9 @@ public class ConfigFile {
     public String getSetting(String name, String section, String defaultValue) {
         String result = defaultValue;
 
-        if (this.config.containsKey(section)) {
-            if (this.config.get(section).containsKey(name)) {
-                result = this.config.get(section).get(name);
+        if (config.containsKey(section)) {
+            if (config.get(section).containsKey(name)) {
+                result = config.get(section).get(name);
             }
         }
 
@@ -82,18 +82,18 @@ public class ConfigFile {
      */
     public void setSetting(String name, String value, String section) {
         /* avoid adding empty values to the config map */
-        if (section.length() > 0 && name.length() > 0 && value.length() > 0) {
+        if (!section.isEmpty() && !name.isEmpty() && !value.isEmpty()) {
             /* create a new hashmap with settings for this section */
             HashMap<String, String> settingMap = new HashMap<String, String>();
 
-            if (this.config.containsKey(section)) {
+            if (config.containsKey(section)) {
                 /* get the current setting map for this section */
-                settingMap = this.config.get(section);
+                settingMap = config.get(section);
             }
 
             /* put name and value to the setting map */
             settingMap.put(name, value);
-            this.config.put(section, settingMap);
+            config.put(section, settingMap);
         }
     }
 
@@ -104,30 +104,25 @@ public class ConfigFile {
      * @return The text content of the ini file as string
      */
     private String getTextContent() {
-        String result = "";
+        StringBuilder result = new StringBuilder();
 
         /* iterate through the hash map and build the ini file content */
-        Iterator<Entry<String, HashMap<String, String>>> iterator = this.config.entrySet().iterator();
-        while (iterator.hasNext()) {
+        for (Entry<String, HashMap<String, String>> pair : config.entrySet()) {
             /* get the current entry */
-            Entry<String, HashMap<String, String>> pair = iterator.next();
-
             /* set the section header first */
-            if (result.length() > 0) {
-                result += "\n";
+            if (!result.isEmpty()) {
+                result.append("\n");
             }
-            result += "[" + pair.getKey() + "]\n";
+            result.append("[").append(pair.getKey()).append("]\n");
 
             /* iterate through all the settings values */
-            Iterator<Entry<String, String>> settingIterator = pair.getValue().entrySet().iterator();
-            while (settingIterator.hasNext()) {
+            for (Entry<String, String> settingEntry : pair.getValue().entrySet()) {
                 /* get the current setting for this section */
-                Entry<String, String> settingEntry = settingIterator.next();
-                result += settingEntry.getKey() + " = " + settingEntry.getValue() + "\n";
+                result.append(settingEntry.getKey()).append(" = ").append(settingEntry.getValue()).append("\n");
             }
         }
 
-        return result;
+        return result.toString();
     }
 
     /**
@@ -135,8 +130,8 @@ public class ConfigFile {
      */
     public void save() {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(this.fileName));
-            writer.write(this.getTextContent());
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+            writer.write(getTextContent());
             writer.close();
         } catch (Exception ex) {
             log.error("Failed to write config file: {}", ex.getMessage());
@@ -149,9 +144,9 @@ public class ConfigFile {
     private void parse() {
         try {
             /* make sure that config file exists */
-            if (Files.exists(Paths.get(this.fileName))) {
+            if (Files.exists(Paths.get(fileName))) {
                 /* read all lines from the defined file */
-                List<String> lineList = Files.readAllLines(Paths.get(this.fileName), Charset.defaultCharset());
+                List<String> lineList = Files.readAllLines(Paths.get(fileName), Charset.defaultCharset());
 
                 /* go through each line */
                 String configSection = "NONE";
@@ -172,7 +167,7 @@ public class ConfigFile {
                                 String[] setting = value.split("=");
                                 if (setting.length == 2) {
                                     /* apply the setting to the config */
-                                    this.setSetting(setting[0].trim(), setting[1].trim(), configSection);
+                                    setSetting(setting[0].trim(), setting[1].trim(), configSection);
                                 }
                             }
                         }
@@ -181,7 +176,7 @@ public class ConfigFile {
             }
         } catch (Exception ex) {
             /* failed to parse config file */
-            log.error("Failed to open and parse file ({}): {}", this.fileName, ex.getMessage());
+            log.error("Failed to open and parse file ({}): {}", fileName, ex.getMessage());
         }
     }
 }

@@ -37,10 +37,12 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Serial;
 import java.util.ArrayList;
 
 @Slf4j
 public class PageMenu extends PopupMenu {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /* the menu items */
@@ -51,9 +53,6 @@ public class PageMenu extends PopupMenu {
     private final MenuItem copyImageUrl;
     private final MenuItem copyImageObject;
     private final MenuItem copySelectedItem;
-    private final MenuItem copyUrlItem;
-    private final MenuItem copyTextItem;
-    private final MenuItem copySourceItem;
     private final MenuItem selectAllItem;
     private final MenuItem setHomeGopherItem;
     private final PopupMenu copyMenu;
@@ -80,8 +79,8 @@ public class PageMenu extends PopupMenu {
         String prefixEnabled = configFile.getSetting("SELECTOR_PREFIX_ENABLED", "Navigation", "yes");
 
         /* request listeners to save the current page as file */
-        this.saveItem = new MenuItem("Save Page As...");
-        this.saveItem.addActionListener(new ActionListener() {
+        saveItem = new MenuItem("Save Page As...");
+        saveItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (currentPage != null) {
@@ -93,8 +92,8 @@ public class PageMenu extends PopupMenu {
         });
 
         /* request listeners to download the file behind the link */
-        this.saveTargetItem = new MenuItem("Save Link As...");
-        this.saveTargetItem.addActionListener(new ActionListener() {
+        saveTargetItem = new MenuItem("Save Link As...");
+        saveTargetItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (targetLink != null) {
@@ -106,8 +105,8 @@ public class PageMenu extends PopupMenu {
         });
 
         /* copies the url of the link target to the clipboard */
-        this.copyTargetUrl = new MenuItem("Copy Link URL");
-        this.copyTargetUrl.addActionListener(new ActionListener() {
+        copyTargetUrl = new MenuItem("Copy Link URL");
+        copyTargetUrl.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (targetLink != null) {
@@ -130,8 +129,8 @@ public class PageMenu extends PopupMenu {
         });
 
         /* copies the url of an individually displayed image */
-        this.copyImageUrl = new MenuItem("Copy Image URL");
-        this.copyImageUrl.addActionListener(new ActionListener() {
+        copyImageUrl = new MenuItem("Copy Image URL");
+        copyImageUrl.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (currentPage != null) {
@@ -154,8 +153,8 @@ public class PageMenu extends PopupMenu {
         });
 
         /* copies the object of the image to clipboard */
-        this.copyImageObject = new MenuItem("Copy Image");
-        this.copyImageObject.addActionListener(new ActionListener() {
+        copyImageObject = new MenuItem("Copy Image");
+        copyImageObject.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (currentPage != null) {
@@ -165,8 +164,8 @@ public class PageMenu extends PopupMenu {
         });
 
         /* copies the text of the active link to the clipboard */
-        this.copyTargetText = new MenuItem("Copy Link Text");
-        this.copyTargetText.addActionListener(new ActionListener() {
+        copyTargetText = new MenuItem("Copy Link Text");
+        copyTargetText.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (targetLink != null) {
@@ -176,8 +175,8 @@ public class PageMenu extends PopupMenu {
         });
 
         /* copies the currently selected text to the clipboard */
-        this.copySelectedItem = new MenuItem("Copy Selection");
-        this.copySelectedItem.addActionListener(new ActionListener() {
+        copySelectedItem = new MenuItem("Copy Selection");
+        copySelectedItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (selectedText.length() > 0) {
@@ -187,8 +186,8 @@ public class PageMenu extends PopupMenu {
         });
 
         /* requests event listeners to select all text */
-        this.selectAllItem = new MenuItem("Select All");
-        this.selectAllItem.addActionListener(new ActionListener() {
+        selectAllItem = new MenuItem("Select All");
+        selectAllItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (PageMenuEventListener listener : eventListenerList) {
@@ -198,8 +197,8 @@ public class PageMenu extends PopupMenu {
         });
 
         /* requests listeners to set current page as home page */
-        this.setHomeGopherItem = new MenuItem("Set As Home Gopher");
-        this.setHomeGopherItem.addActionListener(new ActionListener() {
+        setHomeGopherItem = new MenuItem("Set As Home Gopher");
+        setHomeGopherItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (currentPage != null) {
@@ -211,11 +210,11 @@ public class PageMenu extends PopupMenu {
         });
 
         /* create the copy menu with its sub-items */
-        this.copyMenu = new PopupMenu("Copy");
+        copyMenu = new PopupMenu("Copy");
 
         /* copies the url of the current page to the clipboard */
-        this.copyUrlItem = new MenuItem("URL");
-        this.copyUrlItem.addActionListener(new ActionListener() {
+        MenuItem copyUrlItem = new MenuItem("URL");
+        copyUrlItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (currentPage != null) {
@@ -225,8 +224,8 @@ public class PageMenu extends PopupMenu {
         });
 
         /* copies the text of the current page to the clipboard */
-        this.copyTextItem = new MenuItem("Page Text");
-        this.copyTextItem.addActionListener(new ActionListener() {
+        MenuItem copyTextItem = new MenuItem("Page Text");
+        copyTextItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (currentPage != null) {
@@ -236,8 +235,8 @@ public class PageMenu extends PopupMenu {
         });
 
         /* copies the source code of the page to the clipboard */
-        this.copySourceItem = new MenuItem("Source Code");
-        this.copySourceItem.addActionListener(new ActionListener() {
+        MenuItem copySourceItem = new MenuItem("Source Code");
+        copySourceItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (currentPage != null) {
@@ -247,9 +246,9 @@ public class PageMenu extends PopupMenu {
         });
 
         /* add the items to the copy menu */
-        this.copyMenu.add(this.copyUrlItem);
-        this.copyMenu.add(this.copyTextItem);
-        this.copyMenu.add(this.copySourceItem);
+        copyMenu.add(copyUrlItem);
+        copyMenu.add(copyTextItem);
+        copyMenu.add(copySourceItem);
     }
 
     /**
@@ -258,16 +257,16 @@ public class PageMenu extends PopupMenu {
      * @param listener the listener to add to the list
      */
     public void addPageMenuEventListener(PageMenuEventListener listener) {
-        this.eventListenerList.add(listener);
+        eventListenerList.add(listener);
     }
 
     @Override
     public void show(Component origin, int x, int y) {
         /* remove all items */
-        this.removeAll();
+        removeAll();
 
         /* show menu item based on context */
-        if (this.targetLink == null) {
+        if (targetLink == null) {
             /* we do not have a link target */
             Boolean isImage = false;
 
@@ -276,7 +275,7 @@ public class PageMenu extends PopupMenu {
                 switch (currentPage.getContentType()) {
                     case GOPHERMENU:
                         /* save gopher menu as */
-                        this.saveItem.setLabel("Save Page As ...");
+                        saveItem.setLabel("Save Page As ...");
                         break;
                     case IMAGE_FILE:
                         /* save image file as */
@@ -288,51 +287,51 @@ public class PageMenu extends PopupMenu {
                         break;
                     default:
                         /* save file as is the generic label */
-                        this.saveItem.setLabel("Save File As ...");
+                        saveItem.setLabel("Save File As ...");
                         break;
                 }
             }
 
             /* set the proper label for image files */
             if (isImage) {
-                this.saveItem.setLabel("Save Image As ...");
+                saveItem.setLabel("Save Image As ...");
             }
 
-            this.add(this.saveItem);
-            this.addSeparator();
+            add(saveItem);
+            addSeparator();
 
             /* only show selection copy, when selection exists */
-            if (this.selectedText.length() > 0 && !isImage) {
-                this.add(this.copySelectedItem);
+            if (!selectedText.isEmpty() && !isImage) {
+                add(copySelectedItem);
             }
 
             if (!isImage) {
-                this.add(this.selectAllItem);
-                this.add(copyMenu);
-                this.addSeparator();
+                add(selectAllItem);
+                add(copyMenu);
+                addSeparator();
                 
                 /* only allow setting as home gopher when
                     this page is a gopher menu page */
                 if (currentPage.getContentType() == GopherItemType.GOPHERMENU) {
-                    this.addSeparator();
-                    this.add(this.setHomeGopherItem);
+                    addSeparator();
+                    add(setHomeGopherItem);
                 }
             } else {
-                this.add(this.copyImageObject);
-                this.add(this.copyImageUrl);
+                add(copyImageObject);
+                add(copyImageUrl);
             }
         } else {
             /* we do have a link target */
-            this.add(this.saveTargetItem);
-            this.addSeparator();
-            this.add(this.copyTargetUrl);
+            add(saveTargetItem);
+            addSeparator();
+            add(copyTargetUrl);
 
             /* only show selection copy, when selection exists */
-            if (this.selectedText.length() > 0) {
-                this.add(this.copySelectedItem);
+            if (!selectedText.isEmpty()) {
+                add(copySelectedItem);
             }
 
-            this.add(this.copyTargetText);
+            add(copyTargetText);
         }
 
         /* call the base method */
@@ -373,21 +372,21 @@ public class PageMenu extends PopupMenu {
 
     public void setCurrentPage(GopherPage value) {
         /* reset the link target when a new page was loaded */
-        this.targetLink = null;
+        targetLink = null;
 
         /* set the current page locally */
-        this.currentPage = value;
+        currentPage = value;
     }
 
     public void setLinkTarget(GopherItem value) {
-        this.targetLink = value;
+        targetLink = value;
     }
 
     public void setSelectedText(String value) {
         if (value == null) {
-            this.selectedText = "";
+            selectedText = "";
         } else {
-            this.selectedText = value;
+            selectedText = value;
         }
     }
 }

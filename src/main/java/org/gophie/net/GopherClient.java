@@ -42,9 +42,9 @@ public class GopherClient {
      * Cancels a current fetch operation
      */
     public void cancelFetch() {
-        if (this.thread != null) {
-            this.thread.interrupt();
-            this.cancelled = true;
+        if (thread != null) {
+            thread.interrupt();
+            cancelled = true;
         }
     }
 
@@ -55,7 +55,7 @@ public class GopherClient {
      * @return true when cancelled, false otherwise
      */
     public Boolean isCancelled() {
-        return this.cancelled;
+        return cancelled;
     }
 
     /**
@@ -69,7 +69,7 @@ public class GopherClient {
     public void downloadAsync(String url, String targetFile, GopherClientEventListener eventListener) {
         /* instanciate the new thread */
         GopherClient clientObject = this;
-        this.thread = new Thread(new Runnable() {
+        thread = new Thread(new Runnable() {
             public void run() {
                 try {
                     /* create the output file stream to write to */
@@ -134,7 +134,7 @@ public class GopherClient {
         });
 
         /* start the new thread */
-        this.thread.start();
+        thread.start();
     }
 
     /**
@@ -147,7 +147,7 @@ public class GopherClient {
     public void fetchAsync(String url, GopherItemType contentType, GopherClientEventListener eventListener) {
         /* instanciate the new thread */
         GopherClient clientObject = this;
-        this.thread = new Thread(new Runnable() {
+        thread = new Thread(new Runnable() {
             public void run() {
                 try {
                     GopherPage resultPage = fetch(url, contentType, eventListener);
@@ -174,7 +174,7 @@ public class GopherClient {
         });
 
         /* start the new thread */
-        this.thread.start();
+        thread.start();
     }
 
     /**
@@ -194,7 +194,7 @@ public class GopherClient {
 
         try {
             /* reset the cancellation indicator */
-            this.cancelled = false;
+            cancelled = false;
 
             /* string result with content */
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -219,9 +219,7 @@ public class GopherClient {
                     FileSignatureType fileType = fileSignature.getSignatureItemType();
 
                     /* check if the actual file type is an image */
-                    if (fileType == FileSignatureType.IMAGE &&
-                            (contentType != GopherItemType.IMAGE_FILE
-                                    || contentType != GopherItemType.GIF_FILE)) {
+                    if (fileType == FileSignatureType.IMAGE) {
                         /* when the detected file signature is an image, but
                             the original gopher item type defined is neither
                             a generic image nor a gif file, simply fix the
@@ -267,7 +265,7 @@ public class GopherClient {
                 totalByteCount = totalByteCount + data.length;
 
                 /* report byte count to listener */
-                if (!this.isCancelled()) {
+                if (!isCancelled()) {
                     if (eventListener != null) {
                         eventListener.progress(gopherUrl, totalByteCount);
                     }

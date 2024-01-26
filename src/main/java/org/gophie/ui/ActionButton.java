@@ -18,6 +18,7 @@
 
 package org.gophie.ui;
 
+import lombok.Setter;
 import org.gophie.config.ConfigurationManager;
 import org.gophie.ui.event.ActionButtonEventListener;
 
@@ -32,9 +33,18 @@ public class ActionButton extends JPanel {
     private static final long serialVersionUID = 1L;
 
     /* private variables */
+    @Setter
     private int buttonId = 0;
-    private String inactiveTextColor = "";
-    private String textColor = "";
+    /**
+     * -- SETTER --
+     *  Sets the color for inactive/disabled button
+     *
+     * @param colorHex The color in hex format
+     */
+    @Setter
+    private String inactiveTextColor;
+    @Setter
+    private String textColor;
     private Boolean isEnabledButton = false;
     private final ArrayList<ActionButtonEventListener> eventListenerList = new ArrayList<>();
 
@@ -47,30 +57,30 @@ public class ActionButton extends JPanel {
         super();
 
         /* set text colors locally */
-        this.textColor = textColorHex;
-        this.inactiveTextColor = inactiveTextColorHex;
+        textColor = textColorHex;
+        inactiveTextColor = inactiveTextColorHex;
 
         /* configure the layout for this button */
-        this.setLayout(new BorderLayout());
-        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.setOpaque(false);
+        setLayout(new BorderLayout());
+        setCursor(new Cursor(Cursor.HAND_CURSOR));
+        setOpaque(false);
 
         /* icon for the button using the icon font */
-        this.iconLabel = new JLabel(iconText);
-        this.iconLabel.setBorder(new EmptyBorder(0, 0, 0, 6));
-        this.iconLabel.setOpaque(false);
-        this.iconLabel.setFont(ConfigurationManager.getIconFont(14f));
-        this.iconLabel.setForeground(Color.decode(inactiveTextColorHex));
-        this.add(iconLabel, BorderLayout.WEST);
+        iconLabel = new JLabel(iconText);
+        iconLabel.setBorder(new EmptyBorder(0, 0, 0, 6));
+        iconLabel.setOpaque(false);
+        iconLabel.setFont(ConfigurationManager.getIconFont(14f));
+        iconLabel.setForeground(Color.decode(inactiveTextColorHex));
+        add(iconLabel, BorderLayout.WEST);
 
         /* text for the button using the default text font */
-        this.textLabel = new JLabel(text);
-        this.textLabel.setOpaque(false);
-        this.textLabel.setFont(ConfigurationManager.getDefaultFont(12f));
-        this.textLabel.setForeground(Color.decode(inactiveTextColorHex));
-        this.add(textLabel, BorderLayout.EAST);
+        textLabel = new JLabel(text);
+        textLabel.setOpaque(false);
+        textLabel.setFont(ConfigurationManager.getDefaultFont(12f));
+        textLabel.setForeground(Color.decode(inactiveTextColorHex));
+        add(textLabel, BorderLayout.EAST);
 
-        this.addMouseListener(new MouseAdapter() {
+        addMouseListener(new MouseAdapter() {
             /* notify the listeners of the button pressed event */
             public void mouseReleased(MouseEvent evt) {
                 /* will be handled by another handler */
@@ -96,35 +106,18 @@ public class ActionButton extends JPanel {
         });
     }
 
-    public void setButtonId(int value) {
-        this.buttonId = value;
-    }
-
     /**
      * Adds a new event listener to this button
      *
      * @param listener The event listener to add to this button
      */
     public void addEventListener(ActionButtonEventListener listener) {
-        this.eventListenerList.add(listener);
+        eventListenerList.add(listener);
     }
 
     public void setContent(String iconText, String text) {
-        this.iconLabel.setText(iconText);
-        this.textLabel.setText(text);
-    }
-
-    public void setTextColor(String colorHex) {
-        this.textColor = colorHex;
-    }
-
-    /**
-     * Sets the color for inactive/disabled button
-     *
-     * @param colorHex The color in hex format
-     */
-    public void setInactiveTextColor(String colorHex) {
-        this.inactiveTextColor = colorHex;
+        iconLabel.setText(iconText);
+        textLabel.setText(text);
     }
 
     /**
@@ -133,16 +126,16 @@ public class ActionButton extends JPanel {
      * @param value true means enabled, false is otherwise
      */
     public void setButtonEnabled(Boolean value) {
-        this.isEnabledButton = value;
+        isEnabledButton = value;
 
         if (value) {
-            this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            setCursor(new Cursor(Cursor.HAND_CURSOR));
         } else {
-            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }
 
     public Boolean isButtonEnabled() {
-        return this.isEnabledButton;
+        return isEnabledButton;
     }
 }

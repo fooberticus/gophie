@@ -70,7 +70,7 @@ public class FileSignature {
      * @param fileContent
      */
     public FileSignature(byte[] fileContent) {
-        this.content = fileContent;
+        content = fileContent;
     }
 
     /**
@@ -108,25 +108,25 @@ public class FileSignature {
         FileSignatureType result = FileSignatureType.UNKNOWN;
 
         /* get the hex representation of this file */
-        String fileHex = this.getContentHexString();
+        String fileHex = getContentHexString();
 
         /* set the content type to text if it is text */
-        if (this.isTextContent()) {
+        if (isTextContent()) {
             result = FileSignatureType.TEXT;
         }
 
         /* check if the content contains an image signature */
-        if (this.hasSignature(FileSignature.IMAGE_SIGNATURE_LIST, fileHex)) {
+        if (hasSignature(FileSignature.IMAGE_SIGNATURE_LIST, fileHex)) {
             result = FileSignatureType.IMAGE;
         }
 
         /* check if the content contains a media file signature */
-        if (this.hasSignature(FileSignature.MEDIA_SIGNATURE_LIST, fileHex)) {
+        if (hasSignature(FileSignature.MEDIA_SIGNATURE_LIST, fileHex)) {
             result = FileSignatureType.MEDIA;
         }
 
         /* check if the content contains a binary file signature */
-        if (this.hasSignature(FileSignature.BINARY_SIGNATURE_LIST, fileHex)) {
+        if (hasSignature(FileSignature.BINARY_SIGNATURE_LIST, fileHex)) {
             result = FileSignatureType.BINARY;
         }
 
@@ -149,7 +149,7 @@ public class FileSignature {
         boolean result = false;
 
         /* get the hex string for the byte content */
-        String fileHex = this.getContentHexString();
+        String fileHex = getContentHexString();
 
         /* cound the alphanumeric chars in the data */
         double alphaNumCharCount = 0;
@@ -181,9 +181,9 @@ public class FileSignature {
      * @return
      */
     private String getContentHexString() {
-        char[] hexChars = new char[this.content.length * 2];
-        for (int j = 0; j < this.content.length; j++) {
-            int v = this.content[j] & 0xFF;
+        char[] hexChars = new char[content.length * 2];
+        for (int j = 0; j < content.length; j++) {
+            int v = content[j] & 0xFF;
             hexChars[j * 2] = FileSignature.HEX_VALUE[v >>> 4];
             hexChars[j * 2 + 1] = FileSignature.HEX_VALUE[v & 0x0F];
         }

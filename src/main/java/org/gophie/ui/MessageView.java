@@ -49,42 +49,42 @@ public class MessageView extends JPanel {
         ConfigFile configFile = ConfigurationManager.getConfigFile();
 
         /* get the icon font for this navigation bar */
-        this.iconFont = ConfigurationManager.getIconFont(19f);
+        iconFont = ConfigurationManager.getIconFont(19f);
 
         /* set box layout for this message view */
-        this.setLayout(new BorderLayout());
-        this.setBorder(new EmptyBorder(10, 10, 10, 16));
-        this.setBackground(Color.decode(configFile.getSetting
+        setLayout(new BorderLayout());
+        setBorder(new EmptyBorder(10, 10, 10, 16));
+        setBackground(Color.decode(configFile.getSetting
                 ("MESSAGEVIEW_BACKGROUND_COLOR", "Appearance",
                         MESSAGEVIEW_BACKGROUND_COLOR)));
 
         /* create the label instance */
-        this.messageIcon = new JLabel();
-        this.messageIcon.setFont(this.iconFont);
-        this.messageIcon.setBorder(new EmptyBorder(0, 5, 0, 10));
-        this.messageIcon.setForeground(Color.decode(configFile.getSetting
+        messageIcon = new JLabel();
+        messageIcon.setFont(iconFont);
+        messageIcon.setBorder(new EmptyBorder(0, 5, 0, 10));
+        messageIcon.setForeground(Color.decode(configFile.getSetting
                 ("MESSAGEVIEW_FOREGROUND_COLOR", "Appearance",
                         MESSAGEVIEW_FOREGROUND_COLOR)));
 
-        this.messageText = new JLabel();
-        this.messageText.setFont(ConfigurationManager.getDefaultFont(11f));
-        this.messageText.setForeground(Color.decode(configFile.getSetting
+        messageText = new JLabel();
+        messageText.setFont(ConfigurationManager.getDefaultFont(11f));
+        messageText.setForeground(Color.decode(configFile.getSetting
                 ("MESSAGEVIEW_FOREGROUND_COLOR", "Appearance",
                         MESSAGEVIEW_FOREGROUND_COLOR)));
 
-        this.buttonPanel = new JPanel();
-        this.buttonPanel.setBorder(new EmptyBorder(0, 30, 0, 0));
-        this.buttonPanel.setLayout(new BoxLayout(this.buttonPanel, BoxLayout.X_AXIS));
-        this.buttonPanel.setBackground(Color.decode(configFile.getSetting
+        buttonPanel = new JPanel();
+        buttonPanel.setBorder(new EmptyBorder(0, 30, 0, 0));
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.setBackground(Color.decode(configFile.getSetting
                 ("MESSAGEVIEW_BACKGROUND_COLOR", "Appearance",
                         MESSAGEVIEW_BACKGROUND_COLOR)));
 
-        this.add(this.messageIcon, BorderLayout.WEST);
-        this.add(this.messageText, BorderLayout.CENTER);
-        this.add(this.buttonPanel, BorderLayout.EAST);
+        add(messageIcon, BorderLayout.WEST);
+        add(messageText, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.EAST);
 
         /* do not show by default */
-        this.setVisible(false);
+        setVisible(false);
     }
 
     /**
@@ -115,12 +115,12 @@ public class MessageView extends JPanel {
      */
     public void showInfo(String text) {
         /* build up icon and text */
-        this.messageIcon.setText("");
-        this.messageText.setText(text);
-        this.buttonPanel.removeAll();
+        messageIcon.setText("");
+        messageText.setText(text);
+        buttonPanel.removeAll();
 
         /* add the handle to close this message */
-        JLabel closeButton = this.createButton("Close");
+        JLabel closeButton = createButton("Close");
         closeButton.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent evt) {
                 setVisible(false);
@@ -128,8 +128,8 @@ public class MessageView extends JPanel {
         });
 
         /* create and set to visible */
-        this.buttonPanel.add(closeButton);
-        this.setVisible(true);
+        buttonPanel.add(closeButton);
+        setVisible(true);
     }
 
     /**
@@ -140,13 +140,13 @@ public class MessageView extends JPanel {
      */
     public void showConfirm(String text, String[] optionList, MessageViewListener eventListener) {
         /* remove all components */
-        this.messageIcon.setText("");
-        this.messageText.setText(text);
+        messageIcon.setText("");
+        messageText.setText(text);
 
         /* build the option buttons */
-        this.buttonPanel.removeAll();
+        buttonPanel.removeAll();
         for (int i = 0; i < optionList.length; i++) {
-            JLabel optionButton = this.createButton(optionList[i]);
+            JLabel optionButton = createButton(optionList[i]);
             final int optionId = i;
             optionButton.addMouseListener(new MouseAdapter() {
                 public void mouseReleased(MouseEvent evt) {
@@ -154,9 +154,9 @@ public class MessageView extends JPanel {
                 }
             });
 
-            this.buttonPanel.add(optionButton);
+            buttonPanel.add(optionButton);
         }
 
-        this.setVisible(true);
+        setVisible(true);
     }
 }

@@ -40,9 +40,9 @@ public class GopherItemTypeException extends Exception {
      * @param detectedType  the detected gopher type for this item
      */
     public GopherItemTypeException(String requestedUrl, GopherItemType requestedType, GopherItemType detectedType) {
-        this.url = requestedUrl;
-        this.requested = requestedType;
-        this.detected = detectedType;
+        url = requestedUrl;
+        requested = requestedType;
+        detected = detectedType;
     }
 
     /**
@@ -51,7 +51,7 @@ public class GopherItemTypeException extends Exception {
      * @return url as string
      */
     public String getRequestedUrl() {
-        return this.url;
+        return url;
     }
 
     /**
@@ -60,7 +60,7 @@ public class GopherItemTypeException extends Exception {
      * @return the goper item type requested
      */
     public GopherItemType getRequestedType() {
-        return this.requested;
+        return requested;
     }
 
     /**
@@ -69,6 +69,6 @@ public class GopherItemTypeException extends Exception {
      * @return the gopher item type detected
      */
     public GopherItemType getDetectedType() {
-        return this.detected;
+        return detected;
     }
 }
